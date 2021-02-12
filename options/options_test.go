@@ -1,4 +1,4 @@
-package main
+package options
 
 import (
 	"io/ioutil"
@@ -9,19 +9,6 @@ import (
 )
 
 func TestValidateOptions(t *testing.T) {
-	o := Options{
-		KratosAdminURL:  "http://kratos-admin",
-		KratosPublicURL: "http://kratos-public",
-		BaseURL:         "https://mysite.com",
-	}
-	assert.Nil(t, o.Validate())
-
-	// Error on invalid URL
-	o = Options{
-		KratosAdminURL: ":http//kratos-admin",
-	}
-	assert.EqualError(t, o.Validate(), "'kratos-admin-url' URL ':http//kratos-admin' invalid: parse \":http//kratos-admin\": missing protocol scheme")
-
 	// Temporary files
 	certFile, err := ioutil.TempFile("", "certFile")
 	assert.Nil(t, err)
@@ -31,7 +18,7 @@ func TestValidateOptions(t *testing.T) {
 	assert.Nil(t, err)
 	defer os.Remove(keyFile.Name())
 
-	o = Options{
+	o := Options{
 		TLSCertPath: certFile.Name(),
 		TLSKeyPath:  keyFile.Name(),
 	}
