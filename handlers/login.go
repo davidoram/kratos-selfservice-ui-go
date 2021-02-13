@@ -40,7 +40,7 @@ func loginFuncMap() template.FuncMap {
 			if lbl, ok := fieldLabel[name]; ok {
 				return lbl
 			}
-			println("labelFor name:", name)
+			println("No labelFor name:", name)
 			return ""
 		},
 	}
@@ -62,11 +62,10 @@ func Login(c echo.Context) error {
 	params.SetID(flow)
 	res, err := cc.KratosClient().Public.GetSelfServiceLoginFlow(params)
 	if err != nil {
-		c.Logger().Info("Login error=", err)
+		c.Logger().Error("Error getting self service login flow, redirecting to root. Error:", err)
 		return c.Redirect(http.StatusMovedPermanently, "/")
 	}
 	config := res.GetPayload().Methods["password"].Config
-	c.Logger().Info("Login with config:", config)
 	return c.Render(200, loginPage.Name, map[string]interface{}{
 		"config": config,
 		"flow":   flow})

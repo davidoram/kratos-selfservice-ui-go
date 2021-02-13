@@ -25,6 +25,7 @@ var TemplateRenderer = Template{
 
 // Render renders templates passing data through as required
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	c.Logger().Info("render template:", name)
 	return t.templates[name].ExecuteTemplate(w, name, data)
 }
 

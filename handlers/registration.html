@@ -1,0 +1,35 @@
+{{define "registration"}}
+<html>
+<body>
+
+<h1>Registration</h1>
+<p>Use the form below to register as a new user</p>
+
+<form method="{{.config.Method}}" action="{{.config.Action}}" accept-charset="UTF-8">
+  {{range .config.Fields}}
+    <fieldset>
+      <label>{{labelFor .Name}}</label>
+      <input required="{{.Required}}"
+            name="{{.Name}}"
+            type="{{.Type}}"
+            value="{{.Value}}"
+            {{if .Pattern}} pattern="{{.Pattern}}" {{end}}
+            {{if .Disabled}}disabled{{end}}
+      />
+      {{range .Messages }}
+        <div class="field-message">
+          <span>{{.ID}}</span><p>{{.Text}}</p>
+        </div>
+      {{end}}
+    </fieldset>
+  {{end}}
+  <button>
+      Register
+  </button>
+</form>
+
+<p>If you have already registered, click <a href="/auth/logon">here</a> to logon</p>
+
+</body>
+</html>
+{{ end }}
