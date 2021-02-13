@@ -5,8 +5,8 @@
 <h1>Login</h1>
 <p>Use the form below to login</p>
 
-<form method="POST" action="{{.kratosWebUrl}}/self-service/login/methods/password?flow={{.flow}}" accept-charset="UTF-8">
-  {{range .KratosConfig.Fields}}
+<form method="{{.config.Method}}" action="{{.config.Action}}" accept-charset="UTF-8">
+  {{range .config.Fields}}
     <fieldset>
       <label>{{labelFor .Name}}</label>
       <input required="{{.Required}}"
@@ -27,6 +27,8 @@
       Login
   </button>
 </form>
+
+<p>If you havent get signed up click <a href="/auth/registration">here</a> to register</p>
 
 </body>
 </html>

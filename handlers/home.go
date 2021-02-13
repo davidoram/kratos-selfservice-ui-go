@@ -11,6 +11,8 @@ var homepage = `
 <body>
 <h1>Homepage</h1>
 <a href="/dashboard">Dashboard</a><br>
+<a href="/auth/registration">Registration</a><br>
+<a href="/auth/login">Login</a><br>
 </body>
 </html>
 `

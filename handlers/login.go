@@ -2,6 +2,8 @@ package handlers
 
 import (
 	_ "embed"
+	"html/template"
+	"log"
 	"net/http"
 
 	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
@@ -12,7 +14,39 @@ import (
 //go:embed login.html
 var loginTemplate string
 
-// Login shows the login / registration screen
+var loginPage = PageTemplate{
+	Name:     "login",
+	Template: &loginTemplate,
+	Funcs:    loginFuncMap(),
+}
+
+// Register the templates used by this handler
+func init() {
+	if err := AddPageTemplate(loginPage); err != nil {
+		log.Fatalf("%v template error: %v", loginPage.Name, err)
+	}
+}
+
+// Functions used by the templates
+func loginFuncMap() template.FuncMap {
+
+	fieldLabel := map[string]string{
+		"password":   "Password",
+		"identifier": "Email",
+	}
+
+	return template.FuncMap{
+		"labelFor": func(name string) string {
+			if lbl, ok := fieldLabel[name]; ok {
+				return lbl
+			}
+			println("labelFor name:", name)
+			return ""
+		},
+	}
+}
+
+// Login handler displays the login screen
 func Login(c echo.Context) error {
 	cc := c.(*middleware.CustomContext)
 
@@ -31,18 +65,10 @@ func Login(c echo.Context) error {
 		c.Logger().Info("Login error=", err)
 		return c.Redirect(http.StatusMovedPermanently, "/")
 	}
-	c.Logger().Info("login ", res)
+	config := res.GetPayload().Methods["password"].Config
+	c.Logger().Info("Login with config:", config)
+	return c.Render(200, loginPage.Name, map[string]interface{}{
+		"config": config,
+		"flow":   flow})
 
-	// return c.Render(200, "auth_login/layout.html", map[string]interface{}{
-	// 	"kratosSession":   c.kratosSession,
-	// 	"MetaDescription": "Planting Wizard",
-	// 	"PageTitle":       "Planting Wizard Verify",
-	// 	"NavCurrent":      "login",
-	// 	"KratosConfig":    res.GetPayload().Methods["password"].Config,
-	// 	"flow":            flow,
-	// 	"kratosWebUrl":    c.KratosWebUrl(),
-	// 	"csrf":            csrfToken(c),
-	// })
-
-	return c.String(http.StatusOK, "Login todo")
 }
