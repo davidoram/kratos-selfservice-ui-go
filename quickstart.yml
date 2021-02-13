@@ -26,6 +26,7 @@ services:
     environment:
       - KRATOS_PUBLIC_URL=http://kratos:4433/
       - KRATOS_ADMIN_URL=http://kratos:4434/
+      - BASE_URL=/
     networks:
       - intranet
     restart: on-failure

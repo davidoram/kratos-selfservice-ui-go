@@ -6,7 +6,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+var homepage = `
+<html>
+<body>
+<h1>Homepage</h1>
+<a href="/dashboard">Dashboard</a><br>
+</body>
+</html>
+`
+
 // Home displays a simple homepage
 func Home(c echo.Context) error {
-	return c.String(http.StatusOK, "Homepage")
+	return c.HTML(http.StatusOK, homepage)
 }

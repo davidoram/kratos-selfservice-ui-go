@@ -2,6 +2,7 @@ package options
 
 import (
 	"io/ioutil"
+	"net/url"
 	"os"
 	"testing"
 
@@ -22,13 +23,23 @@ func TestValidateOptions(t *testing.T) {
 		TLSCertPath: certFile.Name(),
 		TLSKeyPath:  keyFile.Name(),
 	}
-	assert.Nil(t, o.Validate())
+
+	// Check URLs must be supplied
+	assert.EqualError(t, o.Validate(), "'kratos-admin-url' URL missing")
+
+	u, _ := url.Parse("http://testhost.com")
+	o.KratosAdminURL = u
+	assert.EqualError(t, o.Validate(), "'kratos-public-url' URL missing")
+	o.KratosPublicURL = u
+	assert.EqualError(t, o.Validate(), "'base-url' URL missing")
+	o.BaseURL = u
 
 	// If provide key or cert, must have both
-	o = Options{
-		TLSCertPath: certFile.Name(),
-		TLSKeyPath:  "",
-	}
+	o.TLSKeyPath = ""
 	assert.EqualError(t, o.Validate(), "To enable HTTPS, provide 'tls-key-path' and 'tls-cert-path'")
+
+	// File paths must be valid
+	o.TLSKeyPath = "/not/a/valid/path"
+	assert.EqualError(t, o.Validate(), "'tls-key-path' file '/not/a/valid/path' invalid")
 
 }

@@ -1,12 +1,21 @@
 package options
 
 import (
+	"log"
 	"net/url"
 )
 
 type URLValue struct {
-	URL     *url.URL
-	Default string // Default URL value if none provided
+	URL *url.URL
+}
+
+func MustMakeURLValue(s string) URLValue {
+	u, err := url.Parse(s)
+	if err != nil {
+		log.Fatalf("Error parsing URL '%s', error; %v", s, err)
+	}
+	return URLValue{u}
+
 }
 
 func (v URLValue) String() string {
@@ -17,9 +26,6 @@ func (v URLValue) String() string {
 }
 
 func (v URLValue) Set(s string) error {
-	if s == "" {
-		s = v.Default
-	}
 	if u, err := url.Parse(s); err != nil {
 		return err
 	} else {
