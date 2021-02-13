@@ -7,6 +7,7 @@ import (
 	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
 	"github.com/davidoram/kratos-selfservice-ui-go/options"
 	"github.com/labstack/echo/v4"
+	elog "github.com/labstack/gommon/log"
 )
 
 func main() {
@@ -24,9 +25,10 @@ func main() {
 	// Echo instance
 	e := echo.New()
 	e.HideBanner = true
+	e.Logger.SetLevel(elog.INFO)
 
 	// Common middleware
-	e.Use(middleware.CustomContextMiddleware(opt))
+	e.Use(middleware.CustomContextMiddleware(opt), middleware.SimpleLog)
 
 	// Routes
 	e.GET("/", handlers.Home, middleware.NoCache())

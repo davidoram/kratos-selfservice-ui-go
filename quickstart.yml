@@ -24,8 +24,8 @@ services:
   kratos-selfservice-ui-go:
     image: davidoram/kratos-selfservice-ui-go:latest
     environment:
-      - KRATOS_PUBLIC_URL=http://127.0.0.1:4433/
-      - KRATOS_ADMIN_URL=http://127.0.0.1:4434/
+      - KRATOS_PUBLIC_URL=http://kratos:4433/
+      - KRATOS_ADMIN_URL=http://kratos:4434/
       - BASE_URL=/
     networks:
       - intranet

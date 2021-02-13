@@ -1,0 +1,33 @@
+{{define "login"}}
+<html>
+<body>
+
+<h1>Login</h1>
+<p>Use the form below to login</p>
+
+<form method="POST" action="{{.kratosWebUrl}}/self-service/login/methods/password?flow={{.flow}}" accept-charset="UTF-8">
+  {{range .KratosConfig.Fields}}
+    <fieldset>
+      <label>{{labelFor .Name}}</label>
+      <input required="{{.Required}}"
+            name="{{.Name}}"
+            type="{{.Type}}"
+            value="{{.Value}}"
+            {{if .Pattern}} pattern="{{.Pattern}}" {{end}}
+            {{if .Disabled}}disabled{{end}}
+      />
+      {{range .Messages }}
+        <div class="field-message">
+          <span>{{.ID}}</span><p>{{.Text}}</p>
+        </div>
+      {{end}}
+    </fieldset>
+  {{end}}
+  <button>
+      Login
+  </button>
+</form>
+
+</body>
+</html>
+{{ end }}

@@ -21,9 +21,9 @@ func CustomContextMiddleware(opt *options.Options) func(echo.HandlerFunc) echo.H
 	client := kratos.NewHTTPClientWithConfig(
 		nil,
 		&kratos.TransportConfig{
-			Schemes:  []string{opt.KratosAdminURL.Scheme},
-			Host:     opt.KratosAdminURL.Host,
-			BasePath: opt.KratosAdminURL.Path})
+			Schemes:  []string{opt.KratosPublicURL.Scheme},
+			Host:     opt.KratosPublicURL.Host,
+			BasePath: opt.KratosPublicURL.Path})
 
 	// CustomContext setup for all callers
 	return func(next echo.HandlerFunc) echo.HandlerFunc {

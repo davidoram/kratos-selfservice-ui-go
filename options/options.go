@@ -106,7 +106,7 @@ func (o *Options) Validate() error {
 // RegistrationURL returns the URL to redirect to that will
 // start the registration flow
 func (o *Options) RegistrationURL() string {
-	url := o.KratosPublicURL
+	url := o.KratosBrowserURL
 	url.Path = "/self-service/registration/browser"
 	return url.String()
 }
@@ -114,7 +114,7 @@ func (o *Options) RegistrationURL() string {
 // LoginFlowURL returns the URL to redirect to that will
 // start the login flow
 func (o *Options) LoginFlowURL() string {
-	url := o.KratosPublicURL
+	url := o.KratosBrowserURL
 	url.Path = "/self-service/login/browser"
 	return url.String()
 }
