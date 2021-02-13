@@ -31,6 +31,8 @@ func TestValidateOptions(t *testing.T) {
 	o.KratosAdminURL = u
 	assert.EqualError(t, o.Validate(), "'kratos-public-url' URL missing")
 	o.KratosPublicURL = u
+	assert.EqualError(t, o.Validate(), "'kratos-browser-url' URL missing")
+	o.KratosBrowserURL = u
 	assert.EqualError(t, o.Validate(), "'base-url' URL missing")
 	o.BaseURL = u
 

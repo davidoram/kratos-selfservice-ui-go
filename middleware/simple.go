@@ -11,6 +11,7 @@ import (
 func ProtectSimple(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		cc := c.(*CustomContext)
+		cc.Logger().Info("ProtectSimple middleware")
 
 		csrfCookie, csrfErr := cc.Request().Cookie("csrf_token")
 		sessionCookie, sessionErr := cc.Request().Cookie("ory_kratos_session")
@@ -29,7 +30,7 @@ func ProtectSimple(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
-		cc.Logger().Info("Not logged in, redirect to ", cc.Options.LoginURL())
-		return c.Redirect(http.StatusMovedPermanently, cc.Options.LoginURL())
+		cc.Logger().Info("Not logged in, redirect to ", cc.Options.LoginPageURL())
+		return c.Redirect(http.StatusMovedPermanently, cc.Options.LoginPageURL())
 	}
 }

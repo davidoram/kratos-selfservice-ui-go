@@ -17,6 +17,7 @@ func main() {
 	}
 	log.Printf("KratosAdminURL: %s", opt.KratosAdminURL.String())
 	log.Printf("KratosPublicURL: %s", opt.KratosPublicURL.String())
+	log.Printf("KratosBrowserURL: %s", opt.KratosPublicURL.String())
 	log.Printf("BaseURL: %s", opt.BaseURL.String())
 	log.Printf("Port: %d", opt.Port)
 
@@ -28,9 +29,10 @@ func main() {
 	e.Use(middleware.CustomContextMiddleware(opt))
 
 	// Routes
-	e.GET("/", handlers.Home)
-	e.GET("/dashboard", handlers.Home, middleware.ProtectSimple)
-	e.GET("/auth/registration", handlers.Registration)
+	e.GET("/", handlers.Home, middleware.NoCache())
+	e.GET("/dashboard", handlers.Home, middleware.NoCache(), middleware.ProtectSimple)
+	e.GET("/auth/registration", handlers.Registration, middleware.NoCache())
+	e.GET("/auth/login", handlers.Login, middleware.NoCache())
 
 	// Start server
 	e.Logger.Fatal(e.Start(opt.Address()))
