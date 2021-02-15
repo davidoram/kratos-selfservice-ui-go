@@ -13,6 +13,7 @@ var homepage = `
 <a href="/dashboard">Dashboard</a><br>
 <a href="/auth/registration">Registration</a><br>
 <a href="/auth/login">Login</a><br>
+<a href="/auth/logout">Logout</a><br>
 </body>
 </html>
 `

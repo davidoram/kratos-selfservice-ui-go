@@ -38,22 +38,3 @@ func AddPageTemplate(pt PageTemplate) error {
 	TemplateRenderer.templates[pt.Name] = tmpl
 	return err
 }
-
-// func registrationFuncMap() template.FuncMap {
-
-// 	fieldLabel := map[string]string{
-// 		"password":          "Password",
-// 		"traits.email":      "Email",
-// 		"traits.name.first": "First name",
-// 		"traits.name.last":  "Surname",
-// 	}
-
-// 	return template.FuncMap{
-// 		"labelFor": func(name string) string {
-// 			if lbl, ok := fieldLabel[name]; ok {
-// 				return lbl
-// 			}
-// 			return ""
-// 		},
-// 	}
-// }

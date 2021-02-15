@@ -35,13 +35,19 @@ func main() {
 	e.Renderer = &handlers.TemplateRenderer
 
 	// Common middleware
-	e.Use(emiddleware.Recover(), middleware.CustomContextMiddleware(opt), middleware.SimpleLog)
+	e.Use(emiddleware.RequestID(),
+		emiddleware.Recover(),
+		emiddleware.LoggerWithConfig(emiddleware.LoggerConfig{
+			Format: "${time_rfc3339} ${id} ${method} ${path} - ${msg} \n",
+		}),
+		middleware.CustomContextMiddleware(opt))
 
 	// Routes
 	e.GET("/", handlers.Home, middleware.NoCache())
-	e.GET("/dashboard", handlers.Home, middleware.NoCache(), middleware.ProtectSimple)
+	e.GET("/dashboard", handlers.Dashboard, middleware.NoCache(), middleware.ProtectSimple)
 	e.GET("/auth/registration", handlers.Registration, middleware.NoCache())
 	e.GET("/auth/login", handlers.Login, middleware.NoCache())
+	e.GET("/auth/logout", handlers.Logout, middleware.NoCache())
 
 	// Start server
 	e.Logger.Fatal(e.Start(opt.Address()))

@@ -103,6 +103,13 @@ func (o *Options) Validate() error {
 	return nil
 }
 
+// WhoAmIURL returns the URL to POST to to get the session
+func (o *Options) WhoAmIURL() string {
+	url := o.KratosPublicURL
+	url.Path = "/sessions/whoami"
+	return url.String()
+}
+
 // RegistrationURL returns the URL to redirect to that will
 // start the registration flow
 func (o *Options) RegistrationURL() string {
@@ -116,6 +123,14 @@ func (o *Options) RegistrationURL() string {
 func (o *Options) LoginFlowURL() string {
 	url := o.KratosBrowserURL
 	url.Path = "/self-service/login/browser"
+	return url.String()
+}
+
+// LogoutFlowURL returns the URL to redirect to that will
+// start the logout flow
+func (o *Options) LogoutFlowURL() string {
+	url := o.KratosBrowserURL
+	url.Path = "/self-service/browser/flows/logout"
 	return url.String()
 }
 

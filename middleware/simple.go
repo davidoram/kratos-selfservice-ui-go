@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"io/ioutil"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/ory/kratos-client-go/client/public"
 )
 
 // ProtectSimple middleware uses ORY Krato's `/sessions/whoami` endpoint to check if the user is signed in or not
@@ -18,15 +18,35 @@ func ProtectSimple(next echo.HandlerFunc) echo.HandlerFunc {
 
 		if csrfErr == nil && sessionErr == nil {
 
-			// Get user info from Krytos
-			params := public.NewWhoamiParams().WithCookie(&csrfCookie.Value).WithAuthorization(&sessionCookie.Value)
-			result, err := cc.KratosClient().Public.Whoami(params, nil)
-			if err != nil {
-				cc.Logger().Error("Error calling Kratos :", err)
+			client := &http.Client{}
+			if req, err := http.NewRequest("POST", cc.Options.WhoAmIURL(), nil); err != nil {
+				c.Logger().Error("Error creating request, error:", err)
 			} else {
-				cc.Logger().Info("Logged in payload:", result.Payload)
-				// TODO Add to session
-				return next(cc)
+				// Add Cookies
+				req.AddCookie(csrfCookie)
+				req.AddCookie(sessionCookie)
+
+				// Setup Headers
+				req.Header.Add("Accept", "application/json")
+
+				// Make the API call
+				if res, err := client.Do(req); err != nil {
+					c.Logger().Error("API returned error:", err)
+				} else {
+					defer res.Body.Close()
+					if body, err := ioutil.ReadAll(res.Body); err != nil {
+						c.Logger().Error("ReadAll error:", err)
+					} else {
+						if res.StatusCode != 200 {
+							c.Logger().Error("Status code not 200, status_code", res.StatusCode)
+						} else {
+							s := string(body)
+							cc.SetKratosSession(&s)
+							cc.Logger().Info("Logged in to kratos")
+							return next(cc)
+						}
+					}
+				}
 			}
 		}
 

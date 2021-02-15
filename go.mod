@@ -9,4 +9,5 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/ory/kratos-client-go v0.5.4-alpha.1 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/tidwall/gjson v1.6.8 // indirect
 )

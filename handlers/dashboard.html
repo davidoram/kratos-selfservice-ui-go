@@ -1,0 +1,24 @@
+{{define "dashboard"}}
+<html>
+<body>
+
+<h1>Dashboard</h1>
+<h3>Welcome back, <span class="user-identifier">{{ .kratosSession.Email }}</span></b></h3>
+
+<h3>This example app is secure by default!</h3>
+        <p>
+            Hello, nice to have you! You signed up with this data:
+        </p>
+        <pre><code></code></pre>
+        <p>
+            Requests to your application contain a ORY Kratos Session Cookie:
+        </p>
+        <pre><code>{{ .headers }}</code></pre>
+
+        <p>which a ExpressJS middleware checks for validity and payload. The decoded ORY Kratos Session payload is as follows:</p>
+        <pre><code></code></pre>
+
+
+</body>
+</html>
+{{ end }}

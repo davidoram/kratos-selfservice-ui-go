@@ -12,8 +12,11 @@ type CustomContext struct {
 	// Options holds the runtime configuration
 	Options *options.Options
 
-	// kratos is a client used to call Krytos public API
+	// Client for Krytos public API
 	kratos *kratos.OryKratos
+
+	// Response from the krytos 'whoami' endpoint
+	kratosSession KratosSession
 }
 
 func CustomContextMiddleware(opt *options.Options) func(echo.HandlerFunc) echo.HandlerFunc {
@@ -28,7 +31,7 @@ func CustomContextMiddleware(opt *options.Options) func(echo.HandlerFunc) echo.H
 	// CustomContext setup for all callers
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			cc := &CustomContext{c, opt, client}
+			cc := &CustomContext{c, opt, client, KratosSession{}}
 			return next(cc)
 		}
 	}
@@ -37,4 +40,14 @@ func CustomContextMiddleware(opt *options.Options) func(echo.HandlerFunc) echo.H
 // KratosClient returns the Kratos API client
 func (cc *CustomContext) KratosClient() *kratos.OryKratos {
 	return cc.kratos
+}
+
+// SetKratosSession sets the whoami response
+func (cc *CustomContext) SetKratosSession(payload *string) {
+	cc.kratosSession.session = payload
+}
+
+// KratosSession returns the whoami response or nil
+func (cc *CustomContext) KratosSession() KratosSession {
+	return cc.kratosSession
 }

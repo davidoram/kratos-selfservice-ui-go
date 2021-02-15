@@ -1,22 +1,42 @@
 package handlers
 
 import (
-	"net/http"
+	_ "embed"
+	"html/template"
+	"log"
 
 	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
 	"github.com/labstack/echo/v4"
 )
 
+//go:embed dashboard.html
+var dashboardTemplate string
+
+var dashboardPage = PageTemplate{
+	Name:     "dashboard",
+	Template: &dashboardTemplate,
+	Funcs:    dashboardFuncMap(),
+}
+
+// Register the templates used by this handler
+func init() {
+	if err := AddPageTemplate(dashboardPage); err != nil {
+		log.Fatalf("%v template error: %v", dashboardPage.Name, err)
+	}
+}
+
+// Functions used by the templates
+func dashboardFuncMap() template.FuncMap {
+
+	return template.FuncMap{}
+}
+
 // Dashboard page is accessible to logged in users only
 func Dashboard(c echo.Context) error {
 	cc := c.(*middleware.CustomContext)
 
-	// The flow is used to identify the login and registration flow and
-	// return data like the csrf_token and so on.
-	flow := c.QueryParam("flow")
-	if flow == "" {
-		return c.Redirect(http.StatusMovedPermanently, cc.Options.RegistrationURL())
-	}
-
-	return c.String(http.StatusOK, "Dashboard")
+	return c.Render(200, dashboardPage.Name, map[string]interface{}{
+		"kratosSession": cc.KratosSession(),
+		"headers":       []string{},
+	})
 }
