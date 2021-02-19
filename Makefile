@@ -18,3 +18,7 @@ quickstart-standalone-up:
 
 quickstart-standalone-down:
 	docker-compose -f quickstart.yml -f quickstart-standalone.yml down
+
+.PHONY: cypress
+cypress:
+	cd cypress-tests && npm run cypress:open

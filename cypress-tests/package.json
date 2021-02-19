@@ -1,0 +1,15 @@
+{
+  "name": "kratos-selfservice-ui-go",
+  "version": "1.0.0",
+  "description": "Cypress tests for kratos-selfservice-ui-go",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cypress:open": "cypress open"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^6.5.0"
+  }
+}

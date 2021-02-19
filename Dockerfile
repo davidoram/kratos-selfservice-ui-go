@@ -1,4 +1,4 @@
-FROM golang:1.16rc1 AS builder
+FROM golang:1.16 AS builder
 
 WORKDIR /go/src/github.com/davidoram/kratos-selfservice-ui-go
 ADD go.mod go.mod
