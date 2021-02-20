@@ -53,7 +53,7 @@ selfservice:
           hooks:
             -
               hook: session
-
+        default_browser_return_url: http://127.0.0.1:4455/?flash_info="Registration complete"
 log:
   level: debug
   format: text

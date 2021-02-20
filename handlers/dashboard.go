@@ -20,14 +20,13 @@ var dashboardPage = PageTemplate{
 
 // Register the templates used by this handler
 func init() {
-	if err := AddPageTemplate(dashboardPage); err != nil {
+	if err := RegisterTemplate(dashboardPage); err != nil {
 		log.Fatalf("%v template error: %v", dashboardPage.Name, err)
 	}
 }
 
 // Functions used by the templates
 func dashboardFuncMap() template.FuncMap {
-
 	return template.FuncMap{}
 }
 

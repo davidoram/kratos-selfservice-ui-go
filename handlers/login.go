@@ -22,7 +22,7 @@ var loginPage = PageTemplate{
 
 // Register the templates used by this handler
 func init() {
-	if err := AddPageTemplate(loginPage); err != nil {
+	if err := RegisterTemplate(loginPage); err != nil {
 		log.Fatalf("%v template error: %v", loginPage.Name, err)
 	}
 }

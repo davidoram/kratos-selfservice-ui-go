@@ -1,8 +1,6 @@
-{{define "login"}}
-<html>
-<body>
+{{define "content"}}
 
-<h1>Login</h1>
+<h1 data-cy="page-heading">Login</h1>
 <p>Use the form below to login</p>
 
 <form method="{{.config.Method}}" action="{{.config.Action}}" accept-charset="UTF-8">
@@ -11,6 +9,7 @@
       <label>{{labelFor .Name}}</label>
       <input required="{{.Required}}"
             name="{{.Name}}"
+            data-cy="{{.Name}}"
             type="{{.Type}}"
             value="{{.Value}}"
             {{if .Pattern}} pattern="{{.Pattern}}" {{end}}
@@ -23,13 +22,11 @@
       {{end}}
     </fieldset>
   {{end}}
-  <button>
+  <button data-cy="submit">
       Login
   </button>
 </form>
 
-<p>If you havent get signed up click <a href="/auth/registration">here</a> to register</p>
+<p>If you havent get signed up click <a data-cy="registration" href="/auth/registration">here</a> to register</p>
 
-</body>
-</html>
 {{ end }}

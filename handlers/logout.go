@@ -21,7 +21,7 @@ var logoutPage = PageTemplate{
 
 // Register the templates used by this handler
 func init() {
-	if err := AddPageTemplate(logoutPage); err != nil {
+	if err := RegisterTemplate(logoutPage); err != nil {
 		log.Fatalf("%v template error: %v", logoutPage.Name, err)
 	}
 }

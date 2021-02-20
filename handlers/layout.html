@@ -1,0 +1,13 @@
+{{define "layout"}}
+<html>
+<body>
+
+{{ if .flash_info }}
+  <div data-cy="flash_info">{{ .flash_info }}</div>
+{{ end }}
+
+{{template "content" . }}
+
+</body>
+</html>
+{{ end }}
