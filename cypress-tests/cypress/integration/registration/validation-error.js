@@ -1,5 +1,5 @@
-it('follows the registration flow', () => {
-  const uuid = () => Cypress._.random(0, 1e6)
+it('detects error during registration, password not secure enough', () => {
+  const uuid = () => Cypress._.random(0, 1e12)
 
   cy.visit('/')
 
@@ -9,7 +9,7 @@ it('follows the registration flow', () => {
 
   // Fill out details for a new user
   var user = {
-    password: "abc123Pass#",
+    password: "password",
     email: "bob" + uuid() + "@gmail.com",
     firstname: "Bob",
     lastname: "Smith"
@@ -21,6 +21,9 @@ it('follows the registration flow', () => {
   cy.get("[data-cy='traits.name.last']").type(user.lastname)
   cy.get('[data-cy=submit]').click()
 
-  // Should be redirected to sucess page
-  cy.get('[data-cy=flash_info]').should('contain', 'Registration complete')
+  // Should stay on the same page
+  cy.get('[data-cy=page-heading]').should('contain', 'Registration')
+
+  // Should display an error against the password field
+  cy.get("[data-cy='field_message_id_password]").should('equal', '4000005')
 })

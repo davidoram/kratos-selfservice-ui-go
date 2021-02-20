@@ -17,7 +17,7 @@
       />
       {{range .Messages }}
         <div class="field-message">
-          <span>{{.ID}}</span><p>{{.Text}}</p>
+          <span data-cy="field_message_id_{{.Name}}">{{.ID}}</span><p>{{.Text}}</p>
         </div>
       {{end}}
     </fieldset>
