@@ -44,6 +44,8 @@ selfservice:
     login:
       ui_url: http://127.0.0.1/auth/login
       lifespan: 10m
+      after:
+        default_browser_return_url: http://127.0.0.1/?flash_info="Logged in"
 
     registration:
       lifespan: 10m

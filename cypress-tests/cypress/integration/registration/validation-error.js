@@ -26,4 +26,13 @@ it('detects error during registration, password not secure enough', () => {
 
   // Should display an error against the password field
   cy.get("[data-cy='field_message_id_password']").should('contain', '4000005')
+
+  // Fix the error, should accept ok
+  cy.get('[data-cy=password]').type("abc123Pass#")
+
+  // Sumbit the form again
+  cy.get('[data-cy=submit]').click()
+
+  // Should be redirected to sucess page
+  cy.get('[data-cy=flash_info]').should('contain', 'Registration complete')
 })
