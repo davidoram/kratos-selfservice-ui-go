@@ -57,6 +57,7 @@ context('Login', () => {
 
     // Should remain on the login page
     cy.get('[data-cy=page-heading]').should('contain', 'Login')
+
   })
 
 })
