@@ -37,7 +37,6 @@ context('Login', () => {
 
   it('allows a user to login', () => {
     // Navigate to the registration page
-    cy.visit('/')
     cy.visit('/auth/login')
     cy.get('[data-cy=page-heading]').should('contain', 'Login')
     cy.get('[data-cy=password]').type(user.password)
@@ -46,6 +45,18 @@ context('Login', () => {
 
     // Should be redirected to sucess page
     cy.get('[data-cy=flash_info]').should('contain', 'Logged in')
+  })
+
+  it('fails login with invalid creds', () => {
+    // Navigate to the registration page
+    cy.visit('/auth/login')
+    cy.get('[data-cy=page-heading]').should('contain', 'Login')
+    cy.get('[data-cy=password]').type("wrong password")
+    cy.get("[data-cy='identifier']").type(user.email)
+    cy.get('[data-cy=submit]').click()
+
+    // Should remain on the login page
+    cy.get('[data-cy=page-heading]').should('contain', 'Login')
   })
 
 })
