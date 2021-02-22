@@ -5,6 +5,7 @@
 
 <form method="{{.config.Method}}" action="{{.config.Action}}" accept-charset="UTF-8">
   {{range .config.Fields}}
+    {{ $field := . }}
     <fieldset>
       <label>{{labelFor .Name}}</label>
       <input required="{{.Required}}"
@@ -17,7 +18,7 @@
       />
       {{range .Messages }}
         <div class="field-message">
-          <span data-cy="field_message_id_{{.Name}}">{{.ID}}</span><p>{{.Text}}</p>
+          <span data-cy="field_message_id_{{$field.Name}}">{{.ID}}</span><p>{{.Text}}</p>
         </div>
       {{end}}
     </fieldset>
@@ -26,7 +27,6 @@
       Register
   </button>
 </form>
-
 <p>If you have already registered, click <a href="/auth/logon">here</a> to logon</p>
 
 {{ end }}

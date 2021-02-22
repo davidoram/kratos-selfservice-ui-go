@@ -19,7 +19,7 @@ services:
       -c /etc/config/kratos/kratos.yml migrate sql -e --yes
     restart: on-failure
     networks:
-      - intranet
+      - internal
 
   kratos-selfservice-ui-go:
     image: davidoram/kratos-selfservice-ui-go:latest
@@ -27,8 +27,19 @@ services:
       - KRATOS_PUBLIC_URL=http://kratos:4433/
       - KRATOS_ADMIN_URL=http://kratos:4434/
       - BASE_URL=/
+      # Enable debug trace of Kratos API calls
+      - DEBUG=1
     networks:
-      - intranet
+      internal:
+        # the aliases are not required, but are useful if the applications want to internally
+        # reference each other by host name
+        aliases:
+        - "app1.test"
+    labels:
+      - "traefik.port=4455"
+      - "traefik.http.routers.kratos-selfservice-ui-go.rule=Path(`/`) || PathPrefix(`/dashboard`,`/auth`)"
+      - "traefik.docker.network=internal"
+      - "traefik.enable=true"
     restart: on-failure
 
   kratos:
@@ -55,7 +66,12 @@ services:
         source: ./contrib/quickstart/kratos/email-password
         target: /etc/config/kratos
     networks:
-      - intranet
+      - internal
+    labels:
+      - "traefik.http.routers.kratos.rule=PathPrefix(`/sessions/`,`/self-service/`)"
+      - "traefik.docker.network=internal"
+      - "traefik.port=4433"
+      - "traefik.enable=true"
 
   mailslurper:
     image: oryd/mailslurper:latest-smtps
@@ -63,10 +79,36 @@ services:
       - "4436:4436"
       - "4437:4437"
     networks:
-      - intranet
+      - internal
+
+  traefik:
+    image: traefik:2.4
+    #command: --web --docker --docker.domain=app.test --logLevel=DEBUG
+    depends_on:
+      # our setup relies on the 3 apps running. Trying to spin up traefik will bring up those too
+      - "mailslurper"
+      - "kratos"
+      - "kratos-selfservice-ui-go"
+    ports:
+      # access this with the correct Host header to access the respective container
+      - "80:80"
+      # management UI
+      - "8080:8080"
+    volumes:
+      # traefik does its magic by reading information about running containers from the docker socket
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/etc/traefik/traefik.yml
+    networks:
+      web:
+      internal:
 
 networks:
-  intranet:
+  # everything that is *only* on "internal network" cannot talk to WAN
+  internal:
+    external: false
+  # add this network to a container to make it talk to the rest of the world
+  web:
+    external: true
 
 volumes:
   kratos-sqlite:

@@ -60,6 +60,7 @@ func Login(c echo.Context) error {
 
 	params := public.NewGetSelfServiceLoginFlowParams()
 	params.SetID(flow)
+	c.Logger().Info("Calling Kratos API to get self service login")
 	res, err := cc.KratosClient().Public.GetSelfServiceLoginFlow(params)
 	if err != nil {
 		c.Logger().Error("Error getting self service login flow, redirecting to root. Error:", err)

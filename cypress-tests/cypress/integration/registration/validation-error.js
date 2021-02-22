@@ -25,5 +25,5 @@ it('detects error during registration, password not secure enough', () => {
   cy.get('[data-cy=page-heading]').should('contain', 'Registration')
 
   // Should display an error against the password field
-  cy.get("[data-cy='field_message_id_password]").should('equal', '4000005')
+  cy.get("[data-cy='field_message_id_password']").should('contain', '4000005')
 })
