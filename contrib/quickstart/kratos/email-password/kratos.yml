@@ -18,22 +18,26 @@ selfservice:
   methods:
     password:
       enabled: true
+    profile:
+      enabled: true
 
   flows:
     error:
       ui_url: http://127.0.0.1/error
 
     settings:
-      ui_url: http://127.0.0.1/settings
+      ui_url: http://127.0.0.1/auth/settings
       privileged_session_max_age: 15m
+      after:
+        default_browser_return_url: http://127.0.0.1/?flash_info="Settings updated"
 
     recovery:
       enabled: true
-      ui_url: http://127.0.0.1/recovery
+      ui_url: http://127.0.0.1/auth/recovery
 
     verification:
       enabled: true
-      ui_url: http://127.0.0.1/verify
+      ui_url: http://127.0.0.1/auth/verify
       after:
         default_browser_return_url: http://127.0.0.1/
 

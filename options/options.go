@@ -118,6 +118,14 @@ func (o *Options) RegistrationURL() string {
 	return url.String()
 }
 
+// SettingsURL returns the URL to redirect to that will
+// start the settings flow
+func (o *Options) SettingsURL() string {
+	url := o.KratosBrowserURL
+	url.Path = "/self-service/settings/browser"
+	return url.String()
+}
+
 // LoginFlowURL returns the URL to redirect to that will
 // start the login flow
 func (o *Options) LoginFlowURL() string {

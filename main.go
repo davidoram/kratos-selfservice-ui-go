@@ -46,6 +46,7 @@ func main() {
 	e.GET("/", handlers.Home, middleware.NoCache())
 	e.GET("/dashboard", handlers.Dashboard, middleware.NoCache(), middleware.ProtectSimple)
 	e.GET("/auth/registration", handlers.Registration, middleware.NoCache())
+	e.GET("/auth/settings", handlers.Settings, middleware.NoCache())
 	e.GET("/auth/login", handlers.Login, middleware.NoCache())
 	e.GET("/auth/logout", handlers.Logout, middleware.NoCache())
 

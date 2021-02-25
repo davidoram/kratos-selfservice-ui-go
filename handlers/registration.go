@@ -64,7 +64,7 @@ func Registration(c echo.Context) error {
 	params := public.NewGetSelfServiceRegistrationFlowParams()
 	params.SetID(flow)
 	c.Logger().Info("Calling Kratos API to get self service registration")
-	res, err := cc.KratosClient().Public.GetSelfServiceRegistrationFlow(params)
+	res, err := cc.KratosPublicClient().Public.GetSelfServiceRegistrationFlow(params)
 	if err != nil {
 		c.Logger().Error("Error getting self service registration flow, redirecting to root. Error:", err)
 		return c.Redirect(http.StatusMovedPermanently, "/")
