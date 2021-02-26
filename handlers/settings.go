@@ -70,10 +70,10 @@ func Settings(c echo.Context) error {
 		c.Logger().Error("Error getting self service settings flow, redirecting to root. Error:", err)
 		return c.Redirect(http.StatusMovedPermanently, "/")
 	}
-	config := res.GetPayload().Methods["password"].Config
+	password := res.GetPayload().Methods["password"].Config
 	profile := res.GetPayload().Methods["profile"].Config
 	return c.Render(200, settingsPage.Name, map[string]interface{}{
-		"config":  config,
-		"profile": profile,
-		"flow":    flow})
+		"password": password,
+		"profile":  profile,
+		"flow":     flow})
 }

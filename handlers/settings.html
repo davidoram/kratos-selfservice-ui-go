@@ -1,6 +1,37 @@
 {{define "content"}}
 
 <h1 data-cy="page-heading">Update Profile</h1>
+
+<h2>Update Password</h2>
+<p>Use the form below to change your password</p>
+
+<form method="{{.password.Method}}" action="{{.password.Action}}" accept-charset="UTF-8">
+  {{range .password.Fields}}
+    {{ $field := . }}
+    <fieldset>
+      <label>{{labelFor .Name}}</label>
+      <input required="{{.Required}}"
+            name="{{.Name}}"
+            data-cy="password_{{.Name}}"
+            type="{{.Type}}"
+            value="{{.Value}}"
+            {{if .Pattern}} pattern="{{.Pattern}}" {{end}}
+            {{if .Disabled}}disabled{{end}}
+      />
+      {{range .Messages }}
+        <div class="field-message">
+          <span data-cy="password_field_message_id_{{$field.Name}}">{{.ID}}</span><p>{{.Text}}</p>
+        </div>
+      {{end}}
+    </fieldset>
+  {{end}}
+  <button data-cy="password_submit">
+      Update
+  </button>
+</form>
+
+
+<h2>Update Profile</h2>
 <p>Use the form below to update your profile</p>
 
 <form method="{{.profile.Method}}" action="{{.profile.Action}}" accept-charset="UTF-8">
@@ -10,7 +41,7 @@
       <label>{{labelFor .Name}}</label>
       <input required="{{.Required}}"
             name="{{.Name}}"
-            data-cy="{{.Name}}"
+            data-cy="profile_{{.Name}}"
             type="{{.Type}}"
             value="{{.Value}}"
             {{if .Pattern}} pattern="{{.Pattern}}" {{end}}
@@ -18,12 +49,12 @@
       />
       {{range .Messages }}
         <div class="field-message">
-          <span data-cy="field_message_id_{{$field.Name}}">{{.ID}}</span><p>{{.Text}}</p>
+          <span data-cy="profile_field_message_id_{{$field.Name}}">{{.ID}}</span><p>{{.Text}}</p>
         </div>
       {{end}}
     </fieldset>
   {{end}}
-  <button data-cy="submit">
+  <button data-cy="profile_submit">
       Update
   </button>
 </form>

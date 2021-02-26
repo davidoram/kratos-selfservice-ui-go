@@ -1,20 +1,25 @@
 {{define "content"}}
 
 <h1 data-cy="page-heading">Dashboard</h1>
-<h3>Welcome back, <span data-cy="email" class="user-identifier">{{ .kratosSession.Email }}</span></b></h3>
+<h3>Welcome back,
+  <b>
+    <span data-cy="first-name">{{ .kratosSession.FirstName }}</span>
+    <span data-cy="last-name">{{ .kratosSession.LastName }}</span>
+  </b>
+</h3>
 
-<h3>This example app is secure by default!</h3>
+<h3>This page is secure by default!</h3>
 <p>
     Hello, nice to have you! You signed up with this data:
 </p>
-<pre><code></code></pre>
+<pre><code><span data-cy="email" class="user-identifier">{{ .kratosSession.Email }}</span></code></pre>
 <p>
     Requests to your application contain a ORY Kratos Session Cookie:
 </p>
 <pre><code>{{ .headers }}</code></pre>
 
-<p>which a ExpressJS middleware checks for validity and payload. The decoded ORY Kratos Session payload is as follows:</p>
-<pre><code></code></pre>
+<p>which middleware checks for validity and payload. The decoded ORY Kratos Session payload is as follows:</p>
+<pre><code>{{.kratosSession.Json}}</code></pre>
 
 
 {{ end }}
