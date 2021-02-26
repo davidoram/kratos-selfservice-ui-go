@@ -16,4 +16,8 @@ quickstart:
 
 .PHONY: cypress
 cypress:
-	cd cypress-tests && npm run cypress:open
+	cd cypress-tests && npm run cypress:open --browser firefox
+
+.PHONY: cypress-headless
+cypress-headless:
+	cd cypress-tests && npm run cypress:run --headless --spec "cypress/integration/*.js"
