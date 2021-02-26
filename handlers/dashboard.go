@@ -33,9 +33,9 @@ func dashboardFuncMap() template.FuncMap {
 // Dashboard page is accessible to logged in users only
 func Dashboard(c echo.Context) error {
 	cc := c.(*middleware.CustomContext)
-	cc.Logger().Info(cc.KratosSession().Json())
+	cc.Logger().Info(cc.KratosSession().JsonPretty())
 	return c.Render(200, dashboardPage.Name, map[string]interface{}{
 		"kratosSession": cc.KratosSession(),
-		"headers":       []string{},
+		"headers":       cc.Request().Header,
 	})
 }

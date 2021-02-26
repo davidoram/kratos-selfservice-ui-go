@@ -16,10 +16,9 @@
 <p>
     Requests to your application contain a ORY Kratos Session Cookie:
 </p>
-<pre><code>{{ .headers }}</code></pre>
 
 <p>which middleware checks for validity and payload. The decoded ORY Kratos Session payload is as follows:</p>
-<pre><code>{{.kratosSession.Json}}</code></pre>
+<pre><code>{{.kratosSession.JsonPretty}}</code></pre>
 
 
 {{ end }}

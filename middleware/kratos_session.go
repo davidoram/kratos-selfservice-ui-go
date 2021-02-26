@@ -1,6 +1,9 @@
 package middleware
 
 import (
+	"bytes"
+	"encoding/json"
+
 	"github.com/tidwall/gjson"
 )
 
@@ -30,4 +33,13 @@ func (ks KratosSession) AddressVerified() bool {
 
 func (ks KratosSession) Json() string {
 	return *ks.session
+}
+
+func (ks KratosSession) JsonPretty() string {
+	buf := new(bytes.Buffer)
+	err := json.Indent(buf, []byte(*ks.session), "", "  ")
+	if err != nil {
+		return *ks.session
+	}
+	return buf.String()
 }
