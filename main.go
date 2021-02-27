@@ -49,6 +49,7 @@ func main() {
 	e.GET("/auth/settings", handlers.Settings, middleware.NoCache())
 	e.GET("/auth/login", handlers.Login, middleware.NoCache())
 	e.GET("/auth/logout", handlers.Logout, middleware.NoCache())
+	e.GET("/auth/recovery", handlers.Recovery, middleware.NoCache())
 
 	// Start server
 	e.Logger.Fatal(e.Start(opt.Address()))

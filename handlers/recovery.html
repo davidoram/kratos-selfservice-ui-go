@@ -1,10 +1,10 @@
 {{define "content"}}
 
-<h1 data-cy="page-heading">Login</h1>
-<p>Use the form below to login</p>
+<h1 data-cy="page-heading">Recover your account</h1>
+<p>Enter your email address to get a recovery email sent</p>
 
-<form method="{{.config.Method}}" action="{{.config.Action}}" accept-charset="UTF-8">
-  {{range .config.Fields}}
+<form method="{{.link.Method}}" action="{{.link.Action}}" accept-charset="UTF-8">
+  {{range .link.Fields}}
     <fieldset>
       <label>{{labelFor .Name}}</label>
       <input required="{{.Required}}"
@@ -23,12 +23,13 @@
     </fieldset>
   {{end}}
   <button data-cy="submit">
-      Login
+      Send recovery link
   </button>
 </form>
 
-<p>If you havent get signed up click <a data-cy="registration" href="/auth/registration">here</a> to register</p>
-
-<p>Click <a data-cy="recovery" href="/auth/recovery">here</a> if you have forgotten your password</p>
+<div data-cy="state" data-value="{{.state}}"></div>
+{{ if eq .state "sent_email" }}
+  <p>An email has been sent</p>
+{{ end }}
 
 {{ end }}

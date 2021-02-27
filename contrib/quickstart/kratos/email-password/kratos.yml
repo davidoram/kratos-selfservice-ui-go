@@ -20,6 +20,8 @@ selfservice:
       enabled: true
     profile:
       enabled: true
+    link:
+      enabled: true
 
   flows:
     error:

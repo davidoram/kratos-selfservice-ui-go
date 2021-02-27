@@ -80,6 +80,7 @@ services:
       - "4437:4437"
     networks:
       - internal
+      - web
 
   traefik:
     image: traefik:2.4

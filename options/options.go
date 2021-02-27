@@ -134,6 +134,14 @@ func (o *Options) LoginFlowURL() string {
 	return url.String()
 }
 
+// RecoveryFlowURL returns the URL to redirect to that will
+// start the recovery flow
+func (o *Options) RecoveryFlowURL() string {
+	url := o.KratosBrowserURL
+	url.Path = "/self-service/recovery/browser"
+	return url.String()
+}
+
 // LogoutFlowURL returns the URL to redirect to that will
 // start the logout flow
 func (o *Options) LogoutFlowURL() string {
