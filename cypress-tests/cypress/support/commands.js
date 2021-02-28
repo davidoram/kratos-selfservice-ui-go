@@ -6,6 +6,8 @@ import {
 } from '../helpers'
 
 
+// delEmails delete *all* emails in Mailslurper
+//
 // See https://github.com/mailslurper/mailslurper/wiki/Email-Endpoints
 Cypress.Commands.add("delEmails", () => {
   console.log("mailslurper delEmails")
@@ -15,6 +17,9 @@ Cypress.Commands.add("delEmails", () => {
     })
 });
 
+// getAllEmails returns the list of emails from Mailslurper
+//
+// See https://github.com/mailslurper/mailslurper/wiki/Email-Endpoints
 Cypress.Commands.add("getAllEmails", () => {
   cy.request('GET', MAIL_API + '/mail')
   .then((response) => {
@@ -24,8 +29,12 @@ Cypress.Commands.add("getAllEmails", () => {
   })
 });
 
+// pollForEmail polls Mailslurper at least 'retries' times until one or more emails is present.
+// It takes some tme for an email sent from kratos to appear in the Mailsurper inbox, so this
+// function will poll Mailslurper until an email turns up
+//
+// See polling technique at https://docs.cypress.io/api/commands/request.html#Request-Polling
 function pollForEmail(retries) {
-  // See polling technique at https://docs.cypress.io/api/commands/request.html#Request-Polling
   cy.request('GET', MAIL_API + '/mail')
   .then((response) => {
     if (response.status === 200 && response.body.totalRecords >= 1) {
@@ -38,6 +47,10 @@ function pollForEmail(retries) {
   })
 }
 
+// getLatestEmail polls Mailslurper for email 20 times, until at least one email is present in the inbox
+// and then returns the last email in the list
+//
+// See https://github.com/mailslurper/mailslurper/wiki/Email-Endpoints
 Cypress.Commands.add("getLatestEmail", () => {
   pollForEmail(20)
   cy.request('GET', MAIL_API + '/mail')
@@ -48,6 +61,9 @@ Cypress.Commands.add("getLatestEmail", () => {
   })
 });
 
+// countEmails returns the total number of emails from Mailslurper
+//
+// See https://github.com/mailslurper/mailslurper/wiki/Email-Endpoints
 Cypress.Commands.add("countEmails", () => {
   cy.request('GET', MAIL_API + '/mail')
   .then((response) => {
@@ -57,6 +73,8 @@ Cypress.Commands.add("countEmails", () => {
   })
 });
 
+// mergeFields combines 'form' with new 'fields'
+//
 const mergeFields = (form, fields) => {
   const result = {}
   form.fields.forEach(({ name, value }) => {
@@ -67,6 +85,14 @@ const mergeFields = (form, fields) => {
 }
 
 
+// registerApi creates a new user in Kratos.
+//
+// Its a fast way of creating a user for a test, and set the 'user' alias:
+//  {
+//    email: "{random email}",
+//    password: "{random password}"
+//  }
+//
 Cypress.Commands.add('registerApi',({ email = gen.email(), password = gen.password(), fields = {} } = {} ) =>
   cy.request({
       url: '/self-service/registration/api'
