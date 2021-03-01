@@ -1,12 +1,8 @@
 /// <reference types="cypress" />
 
-import * as shared from './shared.js'
-
 context('Settings', () => {
-  var user = {}
   beforeEach(() => {
-    cy.visit('/auth/logout')
-    user = shared.registerAndLogin()
+    cy.registerAndLogin()
   })
 
 
@@ -29,7 +25,7 @@ context('Settings', () => {
     cy.get("[data-cy='profile_traits.name.last']").should('have.value', 'Smitty')
   })
 
-   it('allows a user to update their password', () => {
+   it('allows a user to update their password', function() {
     var newPassword = "ghg65svsbs%";
     // Navigate to the registration page
     cy.visit('/auth/settings')
@@ -45,7 +41,7 @@ context('Settings', () => {
     cy.visit('/auth/logout')
     cy.visit('/auth/login')
     cy.get('[data-cy=password]').type(newPassword)
-    cy.get("[data-cy='identifier']").type(user.email)
+    cy.get("[data-cy='identifier']").type(this.user.email)
     cy.get('[data-cy=submit]').click()
 
     // Should be redirected to sucess page

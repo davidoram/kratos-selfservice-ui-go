@@ -1,21 +1,17 @@
 /// <reference types="cypress" />
 
-import * as shared from './shared.js'
-
 context('Login', () => {
-  var user = {}
+
   beforeEach(() => {
-    cy.visit('/auth/logout')
-    user = shared.registerAndLogin()
-    cy.visit('/auth/logout')
+    cy.registerApi()
   })
 
-  it('allows a user to login', () => {
+  it('allows a user to login', function () {
     // Navigate to the registration page
     cy.visit('/auth/login')
     cy.get('[data-cy=page-heading]').should('contain', 'Login')
-    cy.get('[data-cy=password]').type(user.password)
-    cy.get("[data-cy='identifier']").type(user.email)
+    cy.get('[data-cy=password]').type(this.user.password)
+    cy.get("[data-cy='identifier']").type(this.user.email)
     cy.get('[data-cy=submit]').click()
 
     // Should be redirected to sucess page
@@ -34,12 +30,12 @@ context('Login', () => {
 
   })
 
-  it('fails login with invalid creds', () => {
+  it('fails login with invalid creds', function () {
     // Navigate to the registration page
     cy.visit('/auth/login')
     cy.get('[data-cy=page-heading]').should('contain', 'Login')
     cy.get('[data-cy=password]').type("wrong password")
-    cy.get("[data-cy='identifier']").type(user.email)
+    cy.get("[data-cy='identifier']").type(this.user.email)
     cy.get('[data-cy=submit]').click()
 
     // Should remain on the login page
