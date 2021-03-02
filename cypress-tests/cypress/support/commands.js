@@ -5,43 +5,31 @@ import {
   MAIL_API
 } from '../helpers'
 
-
-// delEmails delete *all* emails in Mailslurper
+// mhGetMailsMatchSubject returns the email where the subject matches the
+// regex suppied
 //
-// See https://github.com/mailslurper/mailslurper/wiki/Email-Endpoints
-Cypress.Commands.add("delEmails", () => {
-  cy.log("mailslurper delEmails")
-  cy.request('DELETE', MAIL_API + '/mail', { pruneCode: 'all' })
-  .then((response) => {
-    expect(response.status).to.eq(200)
-  })
+Cypress.Commands.add('mhGetMailsMatchSubject', (regexStr) => {
+  var regex = new RegExp(regexStr);
+  console.log("regex:", regex);
+  cy.mhGetAllMails().then((mails) => {
+    return mails.filter((mail) => {
+      console.log("sub: '" + mail.Content.Headers.Subject[0] + "'");
+      return regex.test(mail.Content.Headers.Subject[0])
+    });
+  });
 });
 
-// getAllEmails returns the list of emails from Mailslurper
+// mhGetLink returns the first link from the body of the email as a URL
 //
-// See https://github.com/mailslurper/mailslurper/wiki/Email-Endpoints
-Cypress.Commands.add("getAllEmails", () => {
-  cy.request('GET', MAIL_API + '/mail')
-  .then((response) => {
-    expect(response.status).to.eq(200)
-    return response.body.mailItems
-  }).then (( mailItems) => {
-    return cy.wrap(mailItems).as('emails')
-  })
-});
+Cypress.Commands.add('mhGetLink', (body) => {
+  console.log("body: ", body);
+  let re = /"(http[\s\S]*?)">/g;
+  let links = re.exec(body);
+  if (links != null) {
+    return links[1];
+  }
+})
 
-
-// countEmails returns the total number of emails from Mailslurper
-//
-// See https://github.com/mailslurper/mailslurper/wiki/Email-Endpoints
-// Cypress.Commands.add("countEmails", () => {
-//   cy.request('GET', MAIL_API + '/mail')
-//   .then((response) => {
-//     expect(response.status).to.eq(200)
-//     cy.log("mailslurper countEmails ", response.body.totalRecords)
-//     return response.body.totalRecords
-//   })
-// });
 
 // mergeFields combines 'form' with new 'fields'
 //

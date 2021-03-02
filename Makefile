@@ -21,3 +21,7 @@ cypress:
 .PHONY: cypress-headless
 cypress-headless:
 	cd cypress-tests && npm run cypress:run --headless --spec "cypress/integration/*.js"
+
+.PHONY: open-mail
+open-mail:
+	open http://localhost:8025

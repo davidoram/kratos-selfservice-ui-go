@@ -11,7 +11,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "^6.5.0"
+    "cypress": "^6.6.0",
+    "cypress-wait-until": "^1.7.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "cypress-mailhog": "^1.3.0"
+  }
 }

@@ -10,7 +10,7 @@ describe('Recovery', () => {
     cy.registerApi()
     .then(() => {
       // Delete the account verification email
-      cy.delEmails()
+      cy.mhDeleteAll();
     })
   })
 
@@ -20,24 +20,28 @@ describe('Recovery', () => {
     cy.visit('/auth/recovery')
     cy.get('[data-cy=email]').type(this.user.email)
     cy.get('[data-cy=submit]').click()
-
+    console.log("clicked");
     // State should be updated
     cy.get('[data-cy=state]').should('have.attr', 'data-value', 'sent_email')
+    .then( () => {
+      cy.waitUntil(() =>
+        cy.mhGetMailsMatchSubject('.*Recover_access_to_your_account.*')
+        .then( mails => mails.length > 0))
 
-    // Get the recovery email
-    cy.getAllEmails().then( function() {
-      cy.log("Email subject:", this.emails[0].subject)
-    }).then(function() {
-      // verify that email contains the code
-      assert.strictEqual(/please verify your account by clicking the following link/.test(this.emails[0].body), true);
-    }).then(function() {
-      // extract the link & click on it
-      var links = this.emails[0].body.match(/href=\"(.*)\" rel/);
-      assert.isDefined(links);
-      expect(links.length).to.equal(2)
-      return links[1]
-    }).then(function( link ) {
-      cy.visit(link)
+    })
+    .then( () => {
+      cy.mhGetMailsMatchSubject('.*Recover_access_to_your_account.*')
+      .mhFirst()
+      .mhGetBody()
+      .then ( (body) => {
+        // Extract the confirmation link
+        cy.mhGetLink(body)
+        .then( (url) => {
+          console.log("url: ", url);
+          // Visit the link
+          cy.visit(url);
+        })
+      })
     })
   })
 
