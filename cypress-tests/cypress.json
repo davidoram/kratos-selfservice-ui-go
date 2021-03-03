@@ -1,4 +1,4 @@
 {
   "baseUrl": "http://127.0.0.1",
-  "mail_url": "http://127.0.0.1:4436"
+  "mailHogUrl": "http://localhost:8025"
 }

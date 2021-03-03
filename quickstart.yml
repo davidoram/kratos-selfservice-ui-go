@@ -73,11 +73,11 @@ services:
       - "traefik.port=4433"
       - "traefik.enable=true"
 
-  mailslurper:
-    image: oryd/mailslurper:latest-smtps
+  mailhog:
+    image: mailhog/mailhog:latest
     ports:
-      - "4436:4436"
-      - "4437:4437"
+      - '8025:8025'
+      - '1025:1025'
     networks:
       - internal
       - web
@@ -87,7 +87,7 @@ services:
     #command: --web --docker --docker.domain=app.test --logLevel=DEBUG
     depends_on:
       # our setup relies on the 3 apps running. Trying to spin up traefik will bring up those too
-      - "mailslurper"
+      - "mailhog"
       - "kratos"
       - "kratos-selfservice-ui-go"
     ports:
