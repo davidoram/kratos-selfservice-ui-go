@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Options struct {
@@ -24,6 +25,9 @@ type Options struct {
 
 	// Port that this app is listening on
 	Port int
+
+	// Duration to wait when asked to shutdown gracefully
+	ShutdownWait time.Duration
 
 	// TLSCertPath is an optional Path to certificate file. Should be set up together with TLSKeyPath to enable HTTPS.
 	TLSCertPath string
@@ -55,6 +59,8 @@ func (o *Options) SetFromCommandLine() *Options {
 	flag.Var(&BaseURL, "base-url", "The base url of this app. If served e.g. behind a proxy or via GitHub pages this would be the path, e.g. https://mywebsite.com/kratos-selfservice-ui-go/. Must be absolute!. Defaults to BASE_URL envar")
 
 	flag.IntVar(&o.Port, "port", parseInt(os.Getenv("PORT")), "Port for this app to listen on. Defaults to PORT envar")
+
+	flag.DurationVar(&o.ShutdownWait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
 
 	flag.StringVar(&o.TLSCertPath, "tls-cert-path", "", "Optional path to the certificate file. Use in conjunction with tls-key-path to enable https.")
 

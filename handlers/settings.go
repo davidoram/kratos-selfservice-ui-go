@@ -2,78 +2,48 @@ package handlers
 
 import (
 	_ "embed"
-	"html/template"
 	"log"
 	"net/http"
 
-	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
-	"github.com/labstack/echo/v4"
+	"github.com/davidoram/kratos-selfservice-ui-go/api_client"
 	"github.com/ory/kratos-client-go/client/public"
 )
 
-//go:embed settings.html
-var settingsTemplate string
-
-var settingsPage = PageTemplate{
-	Name:     "settings",
-	Template: &settingsTemplate,
-	Funcs:    settingsFuncMap(),
+// SettingsParams configure the Settings http handler
+type SettingsParams struct {
+	// FlowRedirectURL is the kratos URL to redirect the browser to,
+	// when the user wishes to edit their settings, and the 'flow' query param is missing
+	FlowRedirectURL string
 }
 
-// Register the templates used by this handler
-func init() {
-	if err := RegisterTemplate(settingsPage); err != nil {
-		log.Fatalf("%v template error: %v", settingsPage.Name, err)
-	}
-}
+// Settings handler displays the Settings screen
+func (lp SettingsParams) Settings(w http.ResponseWriter, r *http.Request) {
 
-// Functions used by the templates
-func settingsFuncMap() template.FuncMap {
-
-	fieldLabel := map[string]string{
-		"password":          "Password",
-		"traits.email":      "Email",
-		"traits.name.first": "First name",
-		"traits.name.last":  "Last name",
-	}
-
-	return template.FuncMap{
-		"labelFor": func(name string) string {
-			if lbl, ok := fieldLabel[name]; ok {
-				return lbl
-			}
-			println("No labelFor name:", name)
-			return ""
-		},
-	}
-}
-
-// Settings directs the user to a page where they can sign-up or
-// register to use the site
-func Settings(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-
-	// The flow is used to identify the login and settings flow and
-	// return data like the csrf_token and so on.
-	flow := c.QueryParam("flow")
+	// Start the Settings flow with Kratos if required
+	flow := r.URL.Query().Get("flow")
 	if flow == "" {
-		c.Logger().Info("No flow ID found in URL, initializing settings flow.")
-		return c.Redirect(http.StatusMovedPermanently, cc.Options.SettingsURL())
+		log.Printf("No flow ID found in URL, initializing Settings flow, redirect to %s", lp.FlowRedirectURL)
+		http.Redirect(w, r, lp.FlowRedirectURL, http.StatusMovedPermanently)
+		return
 	}
 
-	c.Logger().Info("Calling Kratos API to get self service settings")
+	log.Print("Calling Kratos API to get self service settings")
 	params := public.NewGetSelfServiceSettingsFlowParams()
 	params.SetID(flow)
 
-	res, err := cc.KratosAdminClient().Public.GetSelfServiceSettingsFlow(params, nil)
+	res, err := api_client.PublicClient().Public.GetSelfServiceSettingsFlow(params, nil)
 	if err != nil {
-		c.Logger().Error("Error getting self service settings flow, redirecting to root. Error:", err)
-		return c.Redirect(http.StatusMovedPermanently, "/")
+		log.Printf("Error getting self service settings flow: %v, redirecting to /", err)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+		return
 	}
-	password := res.GetPayload().Methods["password"].Config
-	profile := res.GetPayload().Methods["profile"].Config
-	return c.Render(200, settingsPage.Name, map[string]interface{}{
-		"password": password,
-		"profile":  profile,
-		"flow":     flow})
+
+	dataMap := map[string]interface{}{
+		"flow":     flow,
+		"password": res.GetPayload().Methods["password"].Config,
+		"profile":  res.GetPayload().Methods["profile"].Config,
+	}
+	if err = GetTemplate(settingsPage).Render("layout", w, r, dataMap); err != nil {
+		ErrorHandler(w, r, err)
+	}
 }
