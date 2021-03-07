@@ -31,7 +31,7 @@ func (lp SettingsParams) Settings(w http.ResponseWriter, r *http.Request) {
 	params := public.NewGetSelfServiceSettingsFlowParams()
 	params.SetID(flow)
 
-	res, err := api_client.PublicClient().Public.GetSelfServiceSettingsFlow(params, nil)
+	res, err := api_client.AdminClient().Public.GetSelfServiceSettingsFlow(params, nil)
 	if err != nil {
 		log.Printf("Error getting self service settings flow: %v, redirecting to /", err)
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
