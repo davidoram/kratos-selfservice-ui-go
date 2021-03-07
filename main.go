@@ -31,13 +31,14 @@ func main() {
 	log.Printf("KratosBrowserURL: %s", opt.KratosPublicURL.String())
 	log.Printf("BaseURL: %s", opt.BaseURL.String())
 	log.Printf("Address: %s", opt.Address())
+	log.Printf("Number of Cookie store keys: %d", len(opt.CookieStoreKeyPairs))
 
 	// Cetup Kratos API client
 	api_client.InitPublicClient(*opt.KratosPublicURL)
 	api_client.InitAdminClient(*opt.KratosAdminURL)
 
 	// Setup sesssion store in cookies
-	var store = sessions.NewCookieStore([]byte("'+VO7Qir8yZ9idvyPktSBbmaVjDvNw9fRlXTdIBO9FqI=")) // TODO make opt for session key
+	var store = sessions.NewCookieStore(opt.CookieStoreKeyPairs...)
 
 	// Public Routes need no authentication
 	//
