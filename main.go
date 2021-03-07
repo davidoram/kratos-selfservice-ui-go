@@ -44,7 +44,6 @@ func main() {
 	//
 	r := mux.NewRouter()
 	r.Use(gh.RecoveryHandler(gh.PrintRecoveryStack(true)),
-		// gh.LoggingHandler().ServeHTTP,
 		middleware.NoCacheMiddleware)
 
 	homeP := handlers.HomeParams{
@@ -89,6 +88,9 @@ func main() {
 		authP.KratoAuthMiddleware,
 	))
 
+	// Wrap everything in a logger
+	logR := gh.LoggingHandler(os.Stdout, r)
+
 	// Start server
 	srv := &http.Server{
 		Addr: opt.Address(),
@@ -96,7 +98,7 @@ func main() {
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      r, // Pass our instance of gorilla/mux in.
+		Handler:      logR, // Pass our instance of gorilla/mux in.
 	}
 
 	// Run our server in a goroutine so that it doesn't block.
