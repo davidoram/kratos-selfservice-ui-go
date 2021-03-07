@@ -25,3 +25,14 @@ cypress-headless:
 .PHONY: open-mail
 open-mail:
 	open http://localhost:8025
+
+.PHONY: open-traefik
+open-traefik:
+	open http://localhost:8080
+
+.PHONY: open-app
+open-app:
+	open http://localhost:4455
+
+.PHONY: open-all
+open-all: open-mail open-traefik open-app

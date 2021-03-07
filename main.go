@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"time"
@@ -60,7 +61,7 @@ func main() {
 	loginP := handlers.LoginParams{
 		FlowRedirectURL: opt.LoginFlowURL(),
 	}
-	r.HandleFunc("/auth/login", loginP.Login)
+	r.HandleFunc("/auth/login", loginP.Login).Name("login")
 	logoutP := handlers.LogoutParams{
 		FlowRedirectURL: opt.LogoutFlowURL(),
 	}
@@ -74,7 +75,7 @@ func main() {
 	//
 	authP := middleware.KratosAuthParams{
 		WhoAmIURL:         opt.WhoAmIURL(),
-		RedirectUnauthURL: "/",
+		RedirectUnauthURL: MustURL(r.Get("login")).String(),
 		Store:             store,
 	}
 
@@ -122,6 +123,15 @@ func main() {
 	// to finalize based on context cancellation.
 	log.Println("shutting down")
 	os.Exit(0)
+}
+
+// MustURL returns a 'named' URL or panics
+func MustURL(r *mux.Route, pairs ...string) *url.URL {
+	url, err := r.URL(pairs...)
+	if err != nil {
+		log.Fatalf("Error r.URL failed with error: %v", err)
+	}
+	return url
 }
 
 // Middleware (this function) makes adding more than one layer of middleware easy
