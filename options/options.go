@@ -23,7 +23,10 @@ type Options struct {
 	// BaseURL is the base url of this app. If served e.g. behind a proxy or via GitHub pages this would be the path, e.g. https://mywebsite.com/kratos-selfservice-ui-go/. Must be absolute!
 	BaseURL *url.URL
 
-	// Port that this app is listening on
+	// Host that the app is listening on. Used together with Port
+	Host string
+
+	// Port that this app is listening on. Used together with Host
 	Port int
 
 	// Duration to wait when asked to shutdown gracefully
@@ -57,6 +60,8 @@ func (o *Options) SetFromCommandLine() *Options {
 
 	BaseURL := MustMakeURLValue(os.Getenv("BASE_URL"))
 	flag.Var(&BaseURL, "base-url", "The base url of this app. If served e.g. behind a proxy or via GitHub pages this would be the path, e.g. https://mywebsite.com/kratos-selfservice-ui-go/. Must be absolute!. Defaults to BASE_URL envar")
+
+	flag.StringVar(&o.Host, "host", "0.0.0.0", "Optional host that app listens on.")
 
 	flag.IntVar(&o.Port, "port", parseInt(os.Getenv("PORT")), "Port for this app to listen on. Defaults to PORT envar")
 
@@ -165,7 +170,7 @@ func (o *Options) LoginPageURL() string {
 
 // Address that this application will listen on
 func (o *Options) Address() string {
-	return fmt.Sprintf(":%d", o.Port)
+	return fmt.Sprintf("%s:%d", o.Host, o.Port)
 }
 
 func parseInt(s string) int {

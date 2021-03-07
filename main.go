@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/davidoram/kratos-selfservice-ui-go/api_client"
 	"github.com/davidoram/kratos-selfservice-ui-go/handlers"
 	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
 	"github.com/davidoram/kratos-selfservice-ui-go/options"
@@ -28,7 +28,11 @@ func main() {
 	log.Printf("KratosPublicURL: %s", opt.KratosPublicURL.String())
 	log.Printf("KratosBrowserURL: %s", opt.KratosPublicURL.String())
 	log.Printf("BaseURL: %s", opt.BaseURL.String())
-	log.Printf("Port: %d", opt.Port)
+	log.Printf("Address: %s", opt.Address())
+
+	// Cetup Kratos API client
+	api_client.InitPublicClient(*opt.KratosPublicURL)
+	api_client.InitAdminClient(*opt.KratosAdminURL)
 
 	// Setup sesssion store in cookies
 	var store = sessions.NewCookieStore([]byte("'+VO7Qir8yZ9idvyPktSBbmaVjDvNw9fRlXTdIBO9FqI=")) // TODO make opt for session key
@@ -36,11 +40,15 @@ func main() {
 	// Public Routes need no authentication
 	//
 	r := mux.NewRouter()
-	r.Use(gh.RecoveryHandler(),
+	r.Use(gh.RecoveryHandler(gh.PrintRecoveryStack(true)),
 		// gh.LoggingHandler().ServeHTTP,
 		middleware.NoCacheMiddleware)
 
-	r.HandleFunc("/", handlers.Home)
+	homeP := handlers.HomeParams{
+		Store: store,
+	}
+	r.HandleFunc("/", homeP.Home)
+
 	regP := handlers.RegistrationParams{
 		FlowRedirectURL: opt.RegistrationURL(),
 	}
@@ -69,12 +77,18 @@ func main() {
 		RedirectUnauthURL: "/",
 		Store:             store,
 	}
-	dRoute := r.HandleFunc("/dashboard", handlers.Dashboard)
-	dRoute.Subrouter().Use(authP.KratoAuthMiddleware)
+
+	dashP := handlers.DashboardParams{
+		Store: store,
+	}
+	r.Handle("/dashboard", Middleware(
+		http.HandlerFunc(dashP.Dashboard),
+		authP.KratoAuthMiddleware,
+	))
 
 	// Start server
 	srv := &http.Server{
-		Addr: fmt.Sprintf("localhost:%d", opt.Port),
+		Addr: opt.Address(),
 		// Good practice to set timeouts to avoid Slowloris attacks.
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
@@ -108,4 +122,13 @@ func main() {
 	// to finalize based on context cancellation.
 	log.Println("shutting down")
 	os.Exit(0)
+}
+
+// Middleware (this function) makes adding more than one layer of middleware easy
+// by specifying them as a list. It will run the last specified handler first.
+func Middleware(h http.Handler, middleware ...func(http.Handler) http.Handler) http.Handler {
+	for _, mw := range middleware {
+		h = mw(h)
+	}
+	return h
 }

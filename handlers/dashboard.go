@@ -5,13 +5,22 @@ import (
 	"net/http"
 
 	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
-	sessions "github.com/goincremental/negroni-sessions"
+	"github.com/gorilla/sessions"
 )
 
+// DashboardParams configure the Dashboard http handler
+type DashboardParams struct {
+	// Session store
+	Store *sessions.CookieStore
+}
+
 // Dashboard page is accessible to logged in users only
-func Dashboard(w http.ResponseWriter, r *http.Request) {
-	session := sessions.GetSession(r)
-	kratosSession := session.Get("kratosSession").(middleware.KratosSession)
+func (p DashboardParams) Dashboard(w http.ResponseWriter, r *http.Request) {
+	log.Printf("dashboard")
+
+	session, _ := p.Store.Get(r, "my-app-session")
+	kratosSession := middleware.NewKratosSession(session.Values["kratosSession"].(string))
+
 	log.Print(kratosSession.JsonPretty())
 	dataMap := map[string]interface{}{
 		"kratosSession": kratosSession,
@@ -19,5 +28,11 @@ func Dashboard(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := GetTemplate(dashboardPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)
+	}
+}
+
+func (p DashboardParams) ResponderFunc() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		p.Dashboard(w, r)
 	}
 }

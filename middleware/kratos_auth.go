@@ -78,7 +78,7 @@ func (p KratosAuthParams) KratoAuthMiddleware(next http.Handler) http.Handler {
 		// Get a session. We're ignoring the error resulted from decoding an
 		// existing session: Get() always returns a session, even if empty.
 		session, _ := p.Store.Get(r, "my-app-session")
-		session.Values["kratosSession"] = KratosSession{&s}
+		session.Values["kratosSession"] = s
 		// Save it before we write to the response/return from the handler.
 		if err := session.Save(r, w); err != nil {
 			log.Printf("Error saving session: %v, redirect to %s", err, p.RedirectUnauthURL)
