@@ -5,11 +5,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/sessions"
+	"github.com/davidoram/kratos-selfservice-ui-go/session"
 )
 
 // KratosAuthParams configure the KratosAuth http handler
 type KratosAuthParams struct {
+	session.SessionStore
 	// WhoAmIURL is the API endpoint fo the Kratis 'whoami' call that returns the
 	// details of an authenticated session
 	WhoAmIURL string
@@ -17,9 +18,6 @@ type KratosAuthParams struct {
 	// RedirectUnauthURL is where we will rerirect to if the session is
 	// not associated with a valid user
 	RedirectUnauthURL string
-
-	// Session store
-	Store *sessions.CookieStore
 }
 
 // KratoAuthMiddleware retrieves the user from the session via Kratos WhoAmIURL,
@@ -73,14 +71,8 @@ func (p KratosAuthParams) KratoAuthMiddleware(next http.Handler) http.Handler {
 		}
 		defer res.Body.Close()
 
-		s := string(body)
-
-		// Get a session. We're ignoring the error resulted from decoding an
-		// existing session: Get() always returns a session, even if empty.
-		session, _ := p.Store.Get(r, "my-app-session")
-		session.Values["kratosSession"] = s
-		// Save it before we write to the response/return from the handler.
-		if err := session.Save(r, w); err != nil {
+		// Save the kratos session in our application session
+		if err := p.SaveKratosSession(w, r, string(body)); err != nil {
 			log.Printf("Error saving session: %v, redirect to %s", err, p.RedirectUnauthURL)
 			http.Redirect(w, r, p.RedirectUnauthURL, http.StatusPermanentRedirect)
 			return

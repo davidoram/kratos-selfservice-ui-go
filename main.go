@@ -13,6 +13,7 @@ import (
 	"github.com/davidoram/kratos-selfservice-ui-go/handlers"
 	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
 	"github.com/davidoram/kratos-selfservice-ui-go/options"
+	"github.com/davidoram/kratos-selfservice-ui-go/session"
 
 	gh "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -46,7 +47,7 @@ func main() {
 		middleware.NoCacheMiddleware)
 
 	homeP := handlers.HomeParams{
-		Store: store,
+		SessionStore: session.SessionStore{store},
 	}
 	r.HandleFunc("/", homeP.Home)
 
@@ -74,13 +75,13 @@ func main() {
 	// Following routes must be authenticated, so they get extra middleware
 	//
 	authP := middleware.KratosAuthParams{
+		SessionStore:      session.SessionStore{store},
 		WhoAmIURL:         opt.WhoAmIURL(),
 		RedirectUnauthURL: MustURL(r.Get("login")).String(),
-		Store:             store,
 	}
 
 	dashP := handlers.DashboardParams{
-		Store: store,
+		SessionStore: session.SessionStore{store},
 	}
 	r.Handle("/dashboard", Middleware(
 		http.HandlerFunc(dashP.Dashboard),
