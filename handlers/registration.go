@@ -5,12 +5,16 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/benbjohnson/hashfs"
 	"github.com/davidoram/kratos-selfservice-ui-go/api_client"
 	"github.com/ory/kratos-client-go/client/public"
 )
 
 // RegistrationParams configure the Registration http handler
 type RegistrationParams struct {
+	// FS provides access to static files
+	FS *hashfs.FS
+
 	// FlowRedirectURL is the kratos URL to redirect the browser to,
 	// when the user wishes to register, and the 'flow' query param is missing
 	FlowRedirectURL string

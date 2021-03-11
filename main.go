@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"log"
 	"net/http"
 	"net/url"
@@ -15,10 +16,15 @@ import (
 	"github.com/davidoram/kratos-selfservice-ui-go/options"
 	"github.com/davidoram/kratos-selfservice-ui-go/session"
 
+	"github.com/benbjohnson/hashfs"
+
 	gh "github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 )
+
+//go:embed static
+var staticFS embed.FS
 
 func main() {
 
@@ -40,37 +46,55 @@ func main() {
 	// Setup sesssion store in cookies
 	var store = sessions.NewCookieStore(opt.CookieStoreKeyPairs...)
 
+	// Static assets are wrapped in a hash fs that allows for aggesive http caching
+	//
+
+	var fsys = hashfs.NewFS(staticFS)
+
 	// Public Routes need no authentication
 	//
 	r := mux.NewRouter()
+
 	r.Use(gh.RecoveryHandler(gh.PrintRecoveryStack(true)),
 		middleware.NoCacheMiddleware)
 
 	homeP := handlers.HomeParams{
 		SessionStore: session.SessionStore{store},
+		FS:           fsys,
 	}
 	r.HandleFunc("/", homeP.Home)
 
 	regP := handlers.RegistrationParams{
 		FlowRedirectURL: opt.RegistrationURL(),
+		FS:              fsys,
 	}
 	r.HandleFunc("/auth/registration", regP.Registration)
+
 	settingsP := handlers.SettingsParams{
 		FlowRedirectURL: opt.SettingsURL(),
+		FS:              fsys,
 	}
 	r.HandleFunc("/auth/settings", settingsP.Settings)
+
 	loginP := handlers.LoginParams{
 		FlowRedirectURL: opt.LoginFlowURL(),
+		FS:              fsys,
 	}
 	r.HandleFunc("/auth/login", loginP.Login).Name("login")
+
 	logoutP := handlers.LogoutParams{
 		FlowRedirectURL: opt.LogoutFlowURL(),
+		FS:              fsys,
 	}
 	r.HandleFunc("/auth/logout", logoutP.Logout)
+
 	recoverP := handlers.RecoveryParams{
 		FlowRedirectURL: opt.RecoveryFlowURL(),
+		FS:              fsys,
 	}
 	r.HandleFunc("/auth/recovery", recoverP.Recovery)
+
+	r.PathPrefix("/static/").Handler(hashfs.FileServer(fsys))
 
 	// Following routes must be authenticated, so they get extra middleware
 	//

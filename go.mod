@@ -3,6 +3,7 @@ module github.com/davidoram/kratos-selfservice-ui-go
 go 1.16
 
 require (
+	github.com/benbjohnson/hashfs v0.1.0 // indirect
 	github.com/goincremental/negroni-sessions v0.0.0-20171223143234-40b49004abee // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect

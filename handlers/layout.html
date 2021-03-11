@@ -1,6 +1,30 @@
 {{define "layout"}}
+<!doctype html>
 <html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- See https://tailwindcss.com/ -->
+  <link href="{{ .fs.HashName "static/css/tailwind.css" }}" rel="stylesheet">
+
+  <!-- See https://stimulus.hotwire.dev/ -->
+  <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
+
+  <!--
+    Defines common stimulus.js setup
+    -->
+  {{template "common_stimulus" .}}
+
+  <!--
+    Pull in page specific stimulus.
+    See all_templates.go which allows each page to define its own set of stimulus controller
+    -->
+  {{template "stimulus" .}}
+
+</head>
 <body>
+
+{{template "navbar" .}}
 
 {{ if .flash_info }}
   <div data-cy="flash_info">{{ .flash_info }}</div>
@@ -8,7 +32,6 @@
 
 {{template "content" . }}
 
-<a href="/">Home</a>
 </body>
 </html>
 {{ end }}

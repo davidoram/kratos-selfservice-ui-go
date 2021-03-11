@@ -6,8 +6,11 @@ test:
 docker:
 	docker build -t davidoram/kratos-selfservice-ui-go:latest .
 
+build-css: static_src/css/* tailwind.config.js
+	npx tailwindcss-cli@latest build ./static_src/css/tailwind.css -o ./static/css/tailwind.css
+
 .PHONY: run gen-keys
-run:
+run: build-css
 	go run . --kratos-public-url http://127.0.0.1:4433/ \
 		--kratos-browser-url http://127.0.0.1:4433/ \
 		--kratos-admin-url http://127.0.0.1:4434/ \
@@ -43,3 +46,4 @@ open-app:
 
 .PHONY: open-all
 open-all: open-mail open-traefik open-app
+

@@ -22,7 +22,23 @@ The following steps show you how to run individual cypress tests interactively, 
 - In one terminal run `make quickstart`
 - In another  run `make cypress`, and then choose the tests to run.
 
-- TODO
- - Make template names typesafe
- - Style with Tailwind
+# Tailwind CSS
+
+To create the initial css file:
+
+```
+nvm use
+npx tailwindcss-cli@latest build -o static_src/css/tailwind.css
+```
+
+Static assets served via [HashFS](https://github.com/benbjohnson/hashfs) that appends hashes to embedded static assets for aggresive HTTP caching.
+
+# Stimulus
+
+- See [Reference](https://stimulus.hotwire.dev/reference/controllers)
+- Used to show/hide the mobile menu when clicked
+
+# TODO
  - Fix traefik warnings "level=warning msg="Could not find network named 'internal' for container '/kratos-selfservice-ui-go_kratos-selfservice-ui-go_1'! Maybe you're missing the project's prefix in the label? Defaulting to first available network." container=kratos-selfservice-ui-go-kratos-selfservice-ui-go-2fd978669efd2f580e1ac7fcb67271ea7d966fbcdc75a2498c15786af0ff702d serviceName=kratos-selfservice-ui-go-kratos-selfservice-ui-go providerName=docker"
+ - Write up a blog post
+

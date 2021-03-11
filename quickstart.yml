@@ -37,7 +37,7 @@ services:
         - "app1.test"
     labels:
       - "traefik.port=4455"
-      - "traefik.http.routers.kratos-selfservice-ui-go.rule=Path(`/`) || PathPrefix(`/dashboard`,`/auth`)"
+      - "traefik.http.routers.kratos-selfservice-ui-go.rule=Path(`/`) || PathPrefix(`/dashboard`,`/auth`,`/static`)"
       - "traefik.docker.network=internal"
       - "traefik.enable=true"
     restart: on-failure
