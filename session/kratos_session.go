@@ -1,4 +1,4 @@
-package middleware
+package session
 
 import (
 	"bytes"
@@ -9,6 +9,10 @@ import (
 
 type KratosSession struct {
 	session *string
+}
+
+func NewKratosSession(s string) KratosSession {
+	return KratosSession{&s}
 }
 
 func (ks KratosSession) Email() string {

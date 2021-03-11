@@ -1,41 +1,23 @@
 package handlers
 
 import (
-	_ "embed"
-	"html/template"
-	"log"
+	"net/http"
 
-	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
-	"github.com/labstack/echo/v4"
+	"github.com/davidoram/kratos-selfservice-ui-go/session"
 )
 
-//go:embed home.html
-var homeTemplate string
-
-var homePage = PageTemplate{
-	Name:     "home",
-	Template: &homeTemplate,
-	Funcs:    homeFuncMap(),
-}
-
-// Register the templates used by this handler
-func init() {
-	if err := RegisterTemplate(homePage); err != nil {
-		log.Fatalf("%v template error: %v", homePage.Name, err)
-	}
-}
-
-// Functions used by the templates
-func homeFuncMap() template.FuncMap {
-	return template.FuncMap{}
+// HomeParams configure the Home http handler
+type HomeParams struct {
+	session.SessionStore
 }
 
 // Home displays a simple homepage
-func Home(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-
-	return c.Render(200, homePage.Name, map[string]interface{}{
-		"kratosSession": cc.KratosSession(),
+func (p HomeParams) Home(w http.ResponseWriter, r *http.Request) {
+	dataMap := map[string]interface{}{
+		"kratosSession": p.GetKratosSession(r),
 		"headers":       []string{},
-	})
+	}
+	if err := GetTemplate(homePage).Render("layout", w, r, dataMap); err != nil {
+		ErrorHandler(w, r, err)
+	}
 }

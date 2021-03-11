@@ -1,41 +1,32 @@
 package handlers
 
 import (
-	_ "embed"
-	"html/template"
 	"log"
+	"net/http"
 
-	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
-	"github.com/labstack/echo/v4"
+	"github.com/davidoram/kratos-selfservice-ui-go/session"
 )
 
-//go:embed dashboard.html
-var dashboardTemplate string
-
-var dashboardPage = PageTemplate{
-	Name:     "dashboard",
-	Template: &dashboardTemplate,
-	Funcs:    dashboardFuncMap(),
-}
-
-// Register the templates used by this handler
-func init() {
-	if err := RegisterTemplate(dashboardPage); err != nil {
-		log.Fatalf("%v template error: %v", dashboardPage.Name, err)
-	}
-}
-
-// Functions used by the templates
-func dashboardFuncMap() template.FuncMap {
-	return template.FuncMap{}
+// DashboardParams configure the Dashboard http handler
+type DashboardParams struct {
+	session.SessionStore
 }
 
 // Dashboard page is accessible to logged in users only
-func Dashboard(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-	cc.Logger().Info(cc.KratosSession().JsonPretty())
-	return c.Render(200, dashboardPage.Name, map[string]interface{}{
-		"kratosSession": cc.KratosSession(),
-		"headers":       cc.Request().Header,
-	})
+func (p DashboardParams) Dashboard(w http.ResponseWriter, r *http.Request) {
+	log.Printf("dashboard")
+
+	dataMap := map[string]interface{}{
+		"kratosSession": p.GetKratosSession(r),
+		"headers":       []string{},
+	}
+	if err := GetTemplate(dashboardPage).Render("layout", w, r, dataMap); err != nil {
+		ErrorHandler(w, r, err)
+	}
+}
+
+func (p DashboardParams) ResponderFunc() func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		p.Dashboard(w, r)
+	}
 }

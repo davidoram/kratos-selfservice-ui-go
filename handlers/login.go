@@ -1,74 +1,46 @@
 package handlers
 
 import (
-	_ "embed"
-	"html/template"
 	"log"
 	"net/http"
 
-	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
-	"github.com/labstack/echo/v4"
+	"github.com/davidoram/kratos-selfservice-ui-go/api_client"
 	"github.com/ory/kratos-client-go/client/public"
 )
 
-//go:embed login.html
-var loginTemplate string
-
-var loginPage = PageTemplate{
-	Name:     "login",
-	Template: &loginTemplate,
-	Funcs:    loginFuncMap(),
-}
-
-// Register the templates used by this handler
-func init() {
-	if err := RegisterTemplate(loginPage); err != nil {
-		log.Fatalf("%v template error: %v", loginPage.Name, err)
-	}
-}
-
-// Functions used by the templates
-func loginFuncMap() template.FuncMap {
-
-	fieldLabel := map[string]string{
-		"password":   "Password",
-		"identifier": "Email",
-	}
-
-	return template.FuncMap{
-		"labelFor": func(name string) string {
-			if lbl, ok := fieldLabel[name]; ok {
-				return lbl
-			}
-			println("No labelFor name:", name)
-			return ""
-		},
-	}
+// LoginParams configure the Login http handler
+type LoginParams struct {
+	// FlowRedirectURL is the kratos URL to redirect the browser to,
+	// when the user wishes to login, and the 'flow' query param is missing
+	FlowRedirectURL string
 }
 
 // Login handler displays the login screen
-func Login(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
+func (lp LoginParams) Login(w http.ResponseWriter, r *http.Request) {
 
-	// The flow is used to identify the login and registration flow and
-	// return data like the csrf_token and so on.
-	flow := c.QueryParam("flow")
+	// Start the login flow with Kratos if required
+	flow := r.URL.Query().Get("flow")
 	if flow == "" {
-		c.Logger().Info("'No flow ID found in URL, initializing login flow.")
-		return c.Redirect(http.StatusMovedPermanently, cc.Options.LoginFlowURL())
+		log.Printf("No flow ID found in URL, initializing login flow, redirect to %s", lp.FlowRedirectURL)
+		http.Redirect(w, r, lp.FlowRedirectURL, http.StatusMovedPermanently)
+		return
 	}
 
+	// Call Kratos to retrieve the login form
 	params := public.NewGetSelfServiceLoginFlowParams()
 	params.SetID(flow)
-	c.Logger().Info("Calling Kratos API to get self service login")
-	res, err := cc.KratosPublicClient().Public.GetSelfServiceLoginFlow(params)
+	log.Print("Calling Kratos API to get self service login")
+	res, err := api_client.PublicClient().Public.GetSelfServiceLoginFlow(params)
 	if err != nil {
-		c.Logger().Error("Error getting self service login flow, redirecting to root. Error:", err)
-		return c.Redirect(http.StatusMovedPermanently, "/")
+		log.Printf("Error getting self service login flow: %v, redirecting to /", err)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+		return
 	}
-	config := res.GetPayload().Methods["password"].Config
-	return c.Render(200, loginPage.Name, map[string]interface{}{
-		"config": config,
-		"flow":   flow})
-
+	dataMap := map[string]interface{}{
+		"flow":   flow,
+		"config": res.GetPayload().Methods["password"].Config,
+	}
+	if err = GetTemplate(loginPage).Render("layout", w, r, dataMap); err != nil {
+		ErrorHandler(w, r, err)
+	}
 }

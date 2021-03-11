@@ -2,47 +2,35 @@ package handlers
 
 import (
 	_ "embed"
-	"html/template"
 	"log"
 	"net/http"
 
-	"github.com/davidoram/kratos-selfservice-ui-go/middleware"
-	"github.com/labstack/echo/v4"
+	sessions "github.com/goincremental/negroni-sessions"
 )
 
-//go:embed logout.html
-var logoutTemplate string
-
-var logoutPage = PageTemplate{
-	Name:     "logout",
-	Template: &logoutTemplate,
-	Funcs:    logoutFuncMap(),
+// LogoutParams configure the Logout http handler
+type LogoutParams struct {
+	// FlowRedirectURL is the kratos URL to redirect the browser to,
+	// when the user wishes to logout, and the 'flow' query param is missing
+	FlowRedirectURL string
 }
 
-// Register the templates used by this handler
-func init() {
-	if err := RegisterTemplate(logoutPage); err != nil {
-		log.Fatalf("%v template error: %v", logoutPage.Name, err)
-	}
-}
+// Logout handler clears teh session & logs the user out
+func (lp LogoutParams) Logout(w http.ResponseWriter, r *http.Request) {
 
-// Functions used by the templates
-func logoutFuncMap() template.FuncMap {
-	return template.FuncMap{}
-}
-
-// Logout handler displays the logout screen
-func Logout(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-
-	// The flow is used to identify the logout and registration flow and
-	// return data like the csrf_token and so on.
-	flow := c.QueryParam("flow")
+	// Start the logout flow with Kratos if required
+	flow := r.URL.Query().Get("flow")
 	if flow == "" {
-		c.Logger().Info("'No flow ID found in URL, initializing logout flow.")
-		return c.Redirect(http.StatusMovedPermanently, cc.Options.LogoutFlowURL())
+		log.Printf("No flow ID found in URL, initializing logout flow, redirect to %s", lp.FlowRedirectURL)
+		http.Redirect(w, r, lp.FlowRedirectURL, http.StatusMovedPermanently)
+		return
 	}
+	// Clear the session
+	session := sessions.GetSession(r)
+	session.Clear()
 
-	return c.Render(200, logoutPage.Name, map[string]interface{}{})
-
+	dataMap := map[string]interface{}{}
+	if err := GetTemplate(logoutPage).Render("layout", w, r, dataMap); err != nil {
+		ErrorHandler(w, r, err)
+	}
 }

@@ -21,3 +21,8 @@ The following steps show you how to run individual cypress tests interactively, 
 
 - In one terminal run `make quickstart`
 - In another  run `make cypress`, and then choose the tests to run.
+
+- TODO
+ - Make template names typesafe
+ - Style with Tailwind
+ - Fix traefik warnings "level=warning msg="Could not find network named 'internal' for container '/kratos-selfservice-ui-go_kratos-selfservice-ui-go_1'! Maybe you're missing the project's prefix in the label? Defaulting to first available network." container=kratos-selfservice-ui-go-kratos-selfservice-ui-go-2fd978669efd2f580e1ac7fcb67271ea7d966fbcdc75a2498c15786af0ff702d serviceName=kratos-selfservice-ui-go-kratos-selfservice-ui-go providerName=docker"

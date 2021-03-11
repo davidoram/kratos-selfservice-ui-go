@@ -1,12 +1,18 @@
 package options
 
 import (
+	"encoding/base64"
 	"errors"
 	"flag"
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
+	"time"
+
+	"github.com/gorilla/securecookie"
 )
 
 type Options struct {
@@ -22,13 +28,22 @@ type Options struct {
 	// BaseURL is the base url of this app. If served e.g. behind a proxy or via GitHub pages this would be the path, e.g. https://mywebsite.com/kratos-selfservice-ui-go/. Must be absolute!
 	BaseURL *url.URL
 
-	// Port that this app is listening on
+	// Host that the app is listening on. Used together with Port
+	Host string
+
+	// Port that this app is listening on. Used together with Host
 	Port int
+
+	// Duration to wait when asked to shutdown gracefully
+	ShutdownWait time.Duration
 
 	// TLSCertPath is an optional Path to certificate file. Should be set up together with TLSKeyPath to enable HTTPS.
 	TLSCertPath string
 	// TLSCertPath is an optional path to key file Should be set up together with TLSCertPath to enable HTTPS.
 	TLSKeyPath string
+
+	// Pairs of authentication and encryption keys for Cookies
+	CookieStoreKeyPairs [][]byte
 }
 
 func NewOptions() *Options {
@@ -54,18 +69,47 @@ func (o *Options) SetFromCommandLine() *Options {
 	BaseURL := MustMakeURLValue(os.Getenv("BASE_URL"))
 	flag.Var(&BaseURL, "base-url", "The base url of this app. If served e.g. behind a proxy or via GitHub pages this would be the path, e.g. https://mywebsite.com/kratos-selfservice-ui-go/. Must be absolute!. Defaults to BASE_URL envar")
 
+	flag.StringVar(&o.Host, "host", "0.0.0.0", "Optional host that app listens on.")
+
 	flag.IntVar(&o.Port, "port", parseInt(os.Getenv("PORT")), "Port for this app to listen on. Defaults to PORT envar")
+
+	flag.DurationVar(&o.ShutdownWait, "graceful-timeout", time.Second*15, "the duration for which the server gracefully wait for existing connections to finish - e.g. 15s or 1m")
 
 	flag.StringVar(&o.TLSCertPath, "tls-cert-path", "", "Optional path to the certificate file. Use in conjunction with tls-key-path to enable https.")
 
 	flag.StringVar(&o.TLSKeyPath, "tls-key-path", "", "Optional path to the key file. Use in conjunction with tls-cert-path to enable https.")
+
+	var allCookieStoreKeyPairs string
+	flag.StringVar(&allCookieStoreKeyPairs, "cookie-store-key-pairs", os.Getenv("COOKIE_STORE_KEY_PAIRS"), "Pairs of authentication and encryption keys, enclose then in quotes. See the gen-cookie-store-key-pair flag to generate")
+
+	genCookieStoreKeys := false
+	flag.BoolVar(&genCookieStoreKeys, "gen-cookie-store-key-pair", false, "Pass this flag to generate a pairs of authentication and encryption keys and exit")
+
 	flag.Parse()
+
+	if genCookieStoreKeys {
+		authKey := securecookie.GenerateRandomKey(32)
+		encrKey := securecookie.GenerateRandomKey(32)
+		fmt.Printf("The following values are suitable for passing in 'cookie-store-key-pairs' flag:\n")
+		fmt.Printf("%s %s\n",
+			base64.StdEncoding.EncodeToString(authKey),
+			base64.StdEncoding.EncodeToString(encrKey))
+		os.Exit(0)
+	}
 
 	o.KratosAdminURL = KratosAdminURL.URL
 	o.KratosPublicURL = KratosPublicURL.URL
 	o.KratosBrowserURL = KratosBrowserURL.URL
 	o.BaseURL = BaseURL.URL
-
+	o.CookieStoreKeyPairs = make([][]byte, 0)
+	pairs := strings.Split(allCookieStoreKeyPairs, " ")
+	for _, s := range pairs {
+		decoded, err := base64.StdEncoding.DecodeString(s)
+		if err != nil {
+			log.Fatalf("Error decoding 'cookie-store-key-pairs' value: '%s' , did you use 'gen-cookie-store-key-pair' to generate them? Error: %v", s, err)
+		}
+		o.CookieStoreKeyPairs = append(o.CookieStoreKeyPairs, []byte(decoded))
+	}
 	return o
 }
 
@@ -98,6 +142,10 @@ func (o *Options) Validate() error {
 
 	if (o.TLSCertPath == "" && o.TLSKeyPath != "") || (o.TLSCertPath != "" && o.TLSKeyPath == "") {
 		return fmt.Errorf("To enable HTTPS, provide 'tls-key-path' and 'tls-cert-path'")
+	}
+
+	if !(len(o.CookieStoreKeyPairs) == 1 || len(o.CookieStoreKeyPairs)%2 == 0) {
+		return fmt.Errorf("'cookie-store-key-pairs' has %d values, it should contain one auth key, or even pairs of auth & encryption keys separated by a space", len(o.CookieStoreKeyPairs))
 	}
 
 	return nil
@@ -159,7 +207,7 @@ func (o *Options) LoginPageURL() string {
 
 // Address that this application will listen on
 func (o *Options) Address() string {
-	return fmt.Sprintf(":%d", o.Port)
+	return fmt.Sprintf("%s:%d", o.Host, o.Port)
 }
 
 func parseInt(s string) int {
