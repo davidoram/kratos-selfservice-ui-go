@@ -33,7 +33,11 @@ npx tailwindcss-cli@latest build -o static_src/css/tailwind.css
 
 Static assets served via [HashFS](https://github.com/benbjohnson/hashfs) that appends hashes to embedded static assets for aggresive HTTP caching.
 
-# Stimulus
+# Icons
+
+Icons from [Bootstrap](https://icons.getbootstrap.com/)
+
+# Stimulus JS
 
 - See [Reference](https://stimulus.hotwire.dev/reference/controllers)
 - Used to show/hide the mobile menu when clicked

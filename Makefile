@@ -6,11 +6,20 @@ test:
 docker:
 	docker build -t davidoram/kratos-selfservice-ui-go:latest .
 
+clean:
+	rm -rf static
+	mkdir -p static/images static/css
+
 build-css: static_src/css/* tailwind.config.js
 	npx tailwindcss-cli@latest build ./static_src/css/tailwind.css -o ./static/css/tailwind.css
 
-.PHONY: run gen-keys
-run: build-css
+copy-images: static_src/images/*
+	mkdir -p static/images
+	cp -r static_src/images/ static/images/
+
+.PHONY: run gen-keys compile-docker
+run: clean build-css copy-images
+	tree static
 	go run . --kratos-public-url http://127.0.0.1:4433/ \
 		--kratos-browser-url http://127.0.0.1:4433/ \
 		--kratos-admin-url http://127.0.0.1:4434/ \
