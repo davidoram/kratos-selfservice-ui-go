@@ -2,8 +2,12 @@ package handlers
 
 import (
 	_ "embed"
+	"fmt"
 	"html/template"
 	"log"
+	"strings"
+
+	"github.com/benbjohnson/hashfs"
 )
 
 var (
@@ -79,9 +83,32 @@ func init() {
 		}
 		tmpl := append(commonTemplates, t.templates...)
 		tmpl = append(tmpl, stimulusTemplate)
+
+		// Ammend the global functions to the funcMap
+		for k, v := range globalFuncMap() {
+			t.fmap[k] = v
+		}
+
 		if err := RegisterTemplate(t.name, t.fmap, tmpl...); err != nil {
 			log.Fatalf("%v template error: %v", t.name, err)
 		}
+	}
+}
+
+// Default template functions, added to all templates
+func globalFuncMap() template.FuncMap {
+
+	return template.FuncMap{
+		"assetPath": func(fs hashfs.FS, name string) string {
+			if strings.HasPrefix(name, "/") {
+				log.Printf("Error assetPath called with name: '%s' should not start with '/'", name)
+			}
+			path := fs.HashName(name)
+			if strings.HasPrefix(path, "/") {
+				return path
+			}
+			return fmt.Sprintf("/%s", path)
+		},
 	}
 }
 
