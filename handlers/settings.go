@@ -43,10 +43,11 @@ func (lp SettingsParams) Settings(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dataMap := map[string]interface{}{
-		"flow":     flow,
-		"password": res.GetPayload().Methods["password"].Config,
-		"profile":  res.GetPayload().Methods["profile"].Config,
-		"fs":       lp.FS,
+		"flow":        flow,
+		"password":    res.GetPayload().Methods["password"].Config,
+		"profile":     res.GetPayload().Methods["profile"].Config,
+		"fs":          lp.FS,
+		"pageHeading": "Update Profile",
 	}
 	if err = GetTemplate(settingsPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)

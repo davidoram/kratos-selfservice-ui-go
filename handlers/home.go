@@ -19,6 +19,7 @@ func (p HomeParams) Home(w http.ResponseWriter, r *http.Request) {
 		"fs":            p.FS,
 		"kratosSession": p.GetKratosSession(r),
 		"headers":       []string{},
+		"pageHeading":   "Homepage",
 	}
 	if err := GetTemplate(homePage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)

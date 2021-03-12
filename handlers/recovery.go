@@ -43,10 +43,11 @@ func (rp RecoveryParams) Recovery(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("Recovery state:", res.GetPayload().State)
 	dataMap := map[string]interface{}{
-		"flow":  flow,
-		"link":  res.GetPayload().Methods["link"].Config,
-		"state": res.GetPayload().State,
-		"fs":    rp.FS,
+		"flow":        flow,
+		"link":        res.GetPayload().Methods["link"].Config,
+		"state":       res.GetPayload().State,
+		"fs":          rp.FS,
+		"pageHeading": "Recover your account",
 	}
 	if err = GetTemplate(recoveryPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)

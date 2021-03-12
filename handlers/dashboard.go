@@ -24,6 +24,7 @@ func (p DashboardParams) Dashboard(w http.ResponseWriter, r *http.Request) {
 		"kratosSession": p.GetKratosSession(r),
 		"headers":       []string{},
 		"fs":            p.FS,
+		"pageHeading":   "Dashboard",
 	}
 	if err := GetTemplate(dashboardPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)

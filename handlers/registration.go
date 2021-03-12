@@ -43,9 +43,11 @@ func (rp RegistrationParams) Registration(w http.ResponseWriter, r *http.Request
 		return
 	}
 	dataMap := map[string]interface{}{
-		"config": res.GetPayload().Methods["password"].Config,
-		"flow":   flow,
-		"fs":     rp.FS}
+		"config":      res.GetPayload().Methods["password"].Config,
+		"flow":        flow,
+		"fs":          rp.FS,
+		"pageHeading": "Registration",
+	}
 
 	if err = GetTemplate(registrationPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)

@@ -19,6 +19,8 @@ var (
 	navbarTemplate string
 	//go:embed common_stimulus.html
 	commonStimulusTemplate string
+	//go:embed page_heading.html
+	pageHeadingTemplate string
 
 	// Template per page
 	//
@@ -65,7 +67,7 @@ func init() {
 		templates []string
 		stimulus  string // This pages stimulus controller code, optional
 	}
-	commonTemplates := []string{layoutTemplate, navbarTemplate, commonStimulusTemplate}
+	commonTemplates := []string{layoutTemplate, navbarTemplate, commonStimulusTemplate, pageHeadingTemplate}
 	templates := []tmpl{
 		{name: homePage, fmap: emptyFuncMap, templates: []string{homeTemplate}},
 		{name: dashboardPage, fmap: emptyFuncMap, templates: []string{dashboardTemplate}},
