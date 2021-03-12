@@ -5,9 +5,9 @@
     (() => {
       const application = Stimulus.Application.start()
 
-      // menu controller shows/hides the mobile menu when the hamburger button is
+      // navbar controller shows/hides the mobile menu when the hamburger button is
       // pressed
-      application.register("menu", class extends Stimulus.Controller {
+      application.register("navbar", class extends Stimulus.Controller {
 
         static targets = [ "icon", "mobileMenu" ]
 
