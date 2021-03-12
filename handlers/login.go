@@ -43,6 +43,7 @@ func (lp LoginParams) Login(w http.ResponseWriter, r *http.Request) {
 	dataMap := map[string]interface{}{
 		"flow":   flow,
 		"config": res.GetPayload().Methods["password"].Config,
+		"fs":     lp.FS,
 	}
 	if err = GetTemplate(loginPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)

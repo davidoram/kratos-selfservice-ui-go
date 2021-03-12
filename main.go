@@ -59,7 +59,7 @@ func main() {
 		middleware.NoCacheMiddleware)
 
 	homeP := handlers.HomeParams{
-		SessionStore: session.SessionStore{store},
+		SessionStore: session.SessionStore{Store: store},
 		FS:           fsys,
 	}
 	r.HandleFunc("/", homeP.Home)
@@ -99,13 +99,14 @@ func main() {
 	// Following routes must be authenticated, so they get extra middleware
 	//
 	authP := middleware.KratosAuthParams{
-		SessionStore:      session.SessionStore{store},
+		SessionStore:      session.SessionStore{Store: store},
 		WhoAmIURL:         opt.WhoAmIURL(),
 		RedirectUnauthURL: MustURL(r.Get("login")).String(),
 	}
 
 	dashP := handlers.DashboardParams{
-		SessionStore: session.SessionStore{store},
+		SessionStore: session.SessionStore{Store: store},
+		FS:           fsys,
 	}
 	r.Handle("/dashboard", Middleware(
 		http.HandlerFunc(dashP.Dashboard),

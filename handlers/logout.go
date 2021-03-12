@@ -33,7 +33,9 @@ func (lp LogoutParams) Logout(w http.ResponseWriter, r *http.Request) {
 	session := sessions.GetSession(r)
 	session.Clear()
 
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]interface{}{
+		"fs": lp.FS,
+	}
 	if err := GetTemplate(logoutPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)
 	}

@@ -46,6 +46,7 @@ func (rp RecoveryParams) Recovery(w http.ResponseWriter, r *http.Request) {
 		"flow":  flow,
 		"link":  res.GetPayload().Methods["link"].Config,
 		"state": res.GetPayload().State,
+		"fs":    rp.FS,
 	}
 	if err = GetTemplate(recoveryPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)
