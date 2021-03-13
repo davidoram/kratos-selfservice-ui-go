@@ -43,6 +43,7 @@ Icons from [Bootstrap](https://icons.getbootstrap.com/)
 - Used to show/hide the mobile menu when clicked
 
 # TODO
+ - Add gzip middleware
  - Fix traefik warnings "level=warning msg="Could not find network named 'internal' for container '/kratos-selfservice-ui-go_kratos-selfservice-ui-go_1'! Maybe you're missing the project's prefix in the label? Defaulting to first available network." container=kratos-selfservice-ui-go-kratos-selfservice-ui-go-2fd978669efd2f580e1ac7fcb67271ea7d966fbcdc75a2498c15786af0ff702d serviceName=kratos-selfservice-ui-go-kratos-selfservice-ui-go providerName=docker"
  - Write up a blog post
 

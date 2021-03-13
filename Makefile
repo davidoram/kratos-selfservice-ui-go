@@ -17,15 +17,16 @@ copy-images: static_src/images/*
 	mkdir -p static/images
 	cp -r static_src/images/ static/images/
 
-.PHONY: run gen-keys compile-docker
-run: clean build-css copy-images
-	tree static
+.PHONY: fastrun gen-keys compile-docker
+fastrun:
 	go run . --kratos-public-url http://127.0.0.1:4433/ \
 		--kratos-browser-url http://127.0.0.1:4433/ \
 		--kratos-admin-url http://127.0.0.1:4434/ \
 		--base-url / \
 		--port 4455 \
 		--cookie-store-key-pairs '6QKIvm1ZwLD+hrS6zysrs50a8gOU8O385BkVEDdlDN0= 2m/+Pva16CPu3pDs4DLfmR7q74WmI0Bv+3bxdUtHmSQ='
+run: clean build-css copy-images fastrun
+
 gen-keys:
 	go run . --gen-cookie-store-key-pair
 
@@ -55,4 +56,8 @@ open-app:
 
 .PHONY: open-all
 open-all: open-mail open-traefik open-app
+
+.PHONY: install-tailwind
+install-tailwind:
+	npm install tailwindcss tailwindcss-cli@latest @tailwindcss/forms
 
