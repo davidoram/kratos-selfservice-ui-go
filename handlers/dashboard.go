@@ -4,11 +4,15 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/benbjohnson/hashfs"
 	"github.com/davidoram/kratos-selfservice-ui-go/session"
 )
 
 // DashboardParams configure the Dashboard http handler
 type DashboardParams struct {
+	// FS provides access to static files
+	FS *hashfs.FS
+
 	session.SessionStore
 }
 
@@ -19,6 +23,8 @@ func (p DashboardParams) Dashboard(w http.ResponseWriter, r *http.Request) {
 	dataMap := map[string]interface{}{
 		"kratosSession": p.GetKratosSession(r),
 		"headers":       []string{},
+		"fs":            p.FS,
+		"pageHeading":   "Dashboard",
 	}
 	if err := GetTemplate(dashboardPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)

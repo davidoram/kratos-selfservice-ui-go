@@ -1,0 +1,36 @@
+{{define "common_stimulus"}}
+
+<script>
+    // From setup described https://stimulus.hotwire.dev/handbook/installing#using-without-a-build-system
+    (() => {
+      const application = Stimulus.Application.start()
+
+      // navbar controller shows/hides the mobile menu when the hamburger button is
+      // pressed
+      application.register("navbar", class extends Stimulus.Controller {
+
+        static targets = [ "icon", "mobileMenu" ]
+
+        toggle() {
+          // If the user has clicked the menu button toggle the
+          // 'hidden' class on the menu
+          this.mobileMenuTarget.classList.toggle('hidden')
+
+          // Toggle visibility of the different icons that display when the
+          // menu is shown/hidden
+          for (const element of this.iconTargets) {
+            if (element.classList.contains('hidden')) {
+              element.classList.remove('hidden')
+              element.classList.add('block')
+            } else {
+              element.classList.remove('block')
+              element.classList.add('hidden')
+            }
+          }
+        }
+      })
+
+    })()
+  </script>
+
+{{ end }}

@@ -2,8 +2,12 @@ package handlers
 
 import (
 	_ "embed"
+	"fmt"
 	"html/template"
 	"log"
+	"strings"
+
+	"github.com/benbjohnson/hashfs"
 )
 
 var (
@@ -11,6 +15,12 @@ var (
 	//
 	//go:embed layout.html
 	layoutTemplate string
+	//go:embed navbar.html
+	navbarTemplate string
+	//go:embed common_stimulus.html
+	commonStimulusTemplate string
+	//go:embed page_heading.html
+	pageHeadingTemplate string
 
 	// Template per page
 	//
@@ -29,47 +39,78 @@ var (
 	//go:embed settings.html
 	settingsTemplate string
 
-	emptyFuncMap = template.FuncMap{}
+	emptyFuncMap         = template.FuncMap{}
+	emptyStmulusTemplate = `
+	{{define "stimulus"}}
+	<!-- Empty stimulus template -->
+	{{end}}`
 )
 
+// TemplateName is the type used to name a template
+type TemplateName string
+
 const (
-	homePage         = "home"
-	dashboardPage    = "dashboard"
-	loginPage        = "login"
-	logoutPage       = "logout"
-	recoveryPage     = "recovery"
-	registrationPage = "registration"
-	settingsPage     = "settings"
+	homePage         = TemplateName("home")
+	dashboardPage    = TemplateName("dashboard")
+	loginPage        = TemplateName("login")
+	logoutPage       = TemplateName("logout")
+	recoveryPage     = TemplateName("recovery")
+	registrationPage = TemplateName("registration")
+	settingsPage     = TemplateName("settings")
 )
 
 // Register the templates used by this handler
 func init() {
-	if err := RegisterTemplate(homePage, emptyFuncMap, homeTemplate, layoutTemplate); err != nil {
-		log.Fatalf("%v template error: %v", homePage, err)
+	type tmpl struct {
+		name      TemplateName
+		fmap      template.FuncMap
+		templates []string
+		stimulus  string // This pages stimulus controller code, optional
 	}
-
-	if err := RegisterTemplate(dashboardPage, emptyFuncMap, dashboardTemplate, layoutTemplate); err != nil {
-		log.Fatalf("%v template error: %v", dashboardPage, err)
+	commonTemplates := []string{layoutTemplate, navbarTemplate, commonStimulusTemplate, pageHeadingTemplate}
+	templates := []tmpl{
+		{name: homePage, fmap: emptyFuncMap, templates: []string{homeTemplate}},
+		{name: dashboardPage, fmap: emptyFuncMap, templates: []string{dashboardTemplate}},
+		{name: loginPage, fmap: loginFuncMap(), templates: []string{loginTemplate}},
+		{name: logoutPage, fmap: emptyFuncMap, templates: []string{logoutTemplate}},
+		{name: recoveryPage, fmap: recoveryFuncMap(), templates: []string{recoveryTemplate}},
+		{name: registrationPage, fmap: registrationFuncMap(), templates: []string{registrationTemplate}},
+		{name: settingsPage, fmap: settingsFuncMap(), templates: []string{settingsTemplate}},
+		{name: homePage, fmap: emptyFuncMap, templates: []string{homeTemplate}},
 	}
+	for _, t := range templates {
+		stimulusTemplate := emptyStmulusTemplate
+		if t.stimulus != "" {
+			stimulusTemplate = t.stimulus
+		}
+		tmpl := append(commonTemplates, t.templates...)
+		tmpl = append(tmpl, stimulusTemplate)
 
-	if err := RegisterTemplate(loginPage, loginFuncMap(), loginTemplate, layoutTemplate); err != nil {
-		log.Fatalf("%v template error: %v", loginPage, err)
+		// Ammend the global functions to the funcMap
+		for k, v := range globalFuncMap() {
+			t.fmap[k] = v
+		}
+
+		if err := RegisterTemplate(t.name, t.fmap, tmpl...); err != nil {
+			log.Fatalf("%v template error: %v", t.name, err)
+		}
 	}
+}
 
-	if err := RegisterTemplate(logoutPage, emptyFuncMap, logoutTemplate, layoutTemplate); err != nil {
-		log.Fatalf("%v template error: %v", logoutPage, err)
-	}
+// Default template functions, added to all templates
+func globalFuncMap() template.FuncMap {
 
-	if err := RegisterTemplate(recoveryPage, recoveryFuncMap(), recoveryTemplate, layoutTemplate); err != nil {
-		log.Fatalf("%v template error: %v", recoveryPage, err)
-	}
-
-	if err := RegisterTemplate(registrationPage, registrationFuncMap(), registrationTemplate, layoutTemplate); err != nil {
-		log.Fatalf("%v template error: %v", registrationPage, err)
-	}
-
-	if err := RegisterTemplate(settingsPage, settingsFuncMap(), settingsTemplate, layoutTemplate); err != nil {
-		log.Fatalf("%v template error: %v", settingsPage, err)
+	return template.FuncMap{
+		"assetPath": func(fs hashfs.FS, name string) string {
+			if strings.HasPrefix(name, "/") {
+				log.Printf("Error assetPath called with name: '%s' should not start with '/'", name)
+			}
+			path := fs.HashName(name)
+			if strings.HasPrefix(path, "/") {
+				return path
+			}
+			return fmt.Sprintf("/%s", path)
+		},
 	}
 }
 

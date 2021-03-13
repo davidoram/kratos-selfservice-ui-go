@@ -1,33 +1,55 @@
 {{define "content"}}
 
-<h1 data-cy="page-heading">Login</h1>
 <p>Use the form below to login</p>
 
-<form method="{{.config.Method}}" action="{{.config.Action}}" accept-charset="UTF-8">
-  {{range .config.Fields}}
-    <fieldset>
-      <label>{{labelFor .Name}}</label>
-      <input required="{{.Required}}"
-            name="{{.Name}}"
-            data-cy="{{.Name}}"
-            type="{{.Type}}"
-            value="{{.Value}}"
-            {{if .Pattern}} pattern="{{.Pattern}}" {{end}}
-            {{if .Disabled}}disabled{{end}}
-      />
-      {{range .Messages }}
-        <div class="field-message">
-          <span data-cy="field_message_id_{{.Name}}">{{.ID}}</span><p>{{.Text}}</p>
-        </div>
-      {{end}}
-    </fieldset>
-  {{end}}
-  <button data-cy="submit">
-      Login
-  </button>
-</form>
+<div class="md:grid md:grid-cols-1 md:gap-6">
+  <div class="mt-5 md:mt-0">
+    <form method="{{.config.Method}}" action="{{.config.Action}}" accept-charset="UTF-8">
+      <div class="shadow sm:rounded-md sm:overflow-hidden">
+          <div class="px-4 py-5 bg-white space-y-6 sm:p-6">
+            {{range .config.Fields}}
+              {{ $field := . }}
+              <div class="grid grid-cols-3 gap-6">
+                <div class="col-span-3 sm:col-span-2">
+                  <label class="block text-sm font-medium text-gray-700">{{labelFor .Name}}</label>
+                  <div class="mt-1 flex rounded-md shadow-sm">
+                    <input required="{{.Required}}"
+                          name="{{.Name}}"
+                          data-cy="{{.Name}}"
+                          type="{{.Type}}"
+                          value="{{.Value}}"
+                          {{if .Pattern}} pattern="{{.Pattern}}" {{end}}
+                          {{if .Disabled}}disabled{{end}}
+                          class="border mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md px-6 py-4"
+                    />
+                    {{range .Messages }}
+                      <p data-cy="field_message_id_{{$field.Name}}" class="mt-2 text-sm text-gray-500">
+                        <span >{{.ID}}</span>{{.Text}}
+                      </p>
+                    {{end}}
+                  </div>
+                </div>
+              </div>
+            {{end}}
 
-<p>If you havent get signed up click <a data-cy="registration" href="/auth/registration">here</a> to register</p>
+            <div class="grid grid-cols-3 gap-6">
+              <div class="col-span-3 sm:col-span-2">
+                <a href="/" class="button sm:w-auto bg-gray-50 text-gray-400 hover:text-gray-900 leading-6 py-2 px-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-gray-300 focus:outline-none transition-colors duration-200">Cancel</a>
+                <button data-cy="submit"
+                        class="ml-5 bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Login
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<p>If you havent yet signed up, click <a data-cy="registration" href="/auth/registration">here</a> to register</p>
 
 <p>Click <a data-cy="recovery" href="/auth/recovery">here</a> if you have forgotten your password</p>
 

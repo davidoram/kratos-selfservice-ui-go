@@ -4,12 +4,16 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/benbjohnson/hashfs"
 	"github.com/davidoram/kratos-selfservice-ui-go/api_client"
 	"github.com/ory/kratos-client-go/client/public"
 )
 
 // RecoveryParams configure the Recovery http handler
 type RecoveryParams struct {
+	// FS provides access to static files
+	FS *hashfs.FS
+
 	// FlowRedirectURL is the kratos URL to redirect the browser to,
 	// when the user wishes to start recovery, and the 'flow' query param is missing
 	FlowRedirectURL string
@@ -39,9 +43,11 @@ func (rp RecoveryParams) Recovery(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("Recovery state:", res.GetPayload().State)
 	dataMap := map[string]interface{}{
-		"flow":  flow,
-		"link":  res.GetPayload().Methods["link"].Config,
-		"state": res.GetPayload().State,
+		"flow":        flow,
+		"link":        res.GetPayload().Methods["link"].Config,
+		"state":       res.GetPayload().State,
+		"fs":          rp.FS,
+		"pageHeading": "Recover your account",
 	}
 	if err = GetTemplate(recoveryPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)

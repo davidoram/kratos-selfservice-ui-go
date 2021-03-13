@@ -19,7 +19,7 @@ context('Registration', () => {
     cy.visit('/')
 
     // Navigate to the registration page
-    cy.get('[data-cy=registration]').click()
+    cy.get('[data-cy=registration]').first().click()
     cy.get('[data-cy=page-heading]').should('contain', 'Registration')
 
     // Fill out details for a new user
@@ -38,7 +38,7 @@ context('Registration', () => {
     cy.visit('/')
 
     // Navigate to the registration page
-    cy.get('[data-cy=registration]').click()
+    cy.get('[data-cy=registration]').first().click()
 
     cy.get('[data-cy=page-heading]').should('contain', 'Registration')
 

@@ -15,7 +15,7 @@ type Template struct {
 }
 
 var (
-	templateMap = make(map[string]Template)
+	templateMap = make(map[TemplateName]Template)
 )
 
 const (
@@ -25,9 +25,9 @@ const (
 
 // RegisterTemplate creates a html template with a name, and a FuncMap for a set of template strings.
 // Pass all the Map youu want included in the 'templates', including layout templates etc
-func RegisterTemplate(name string, fmap template.FuncMap, templates ...string) error {
+func RegisterTemplate(name TemplateName, fmap template.FuncMap, templates ...string) error {
 	var err error
-	tmpl := template.New(name).Funcs(fmap)
+	tmpl := template.New(string(name)).Funcs(fmap)
 	for _, t := range templates {
 		tmpl, err = tmpl.Parse(t)
 		if err != nil {
@@ -39,7 +39,7 @@ func RegisterTemplate(name string, fmap template.FuncMap, templates ...string) e
 }
 
 // GetTemplate returns template with name or nil
-func GetTemplate(name string) Template {
+func GetTemplate(name TemplateName) Template {
 	return templateMap[name]
 }
 

@@ -5,11 +5,15 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/benbjohnson/hashfs"
 	sessions "github.com/goincremental/negroni-sessions"
 )
 
 // LogoutParams configure the Logout http handler
 type LogoutParams struct {
+	// FS provides access to static files
+	FS *hashfs.FS
+
 	// FlowRedirectURL is the kratos URL to redirect the browser to,
 	// when the user wishes to logout, and the 'flow' query param is missing
 	FlowRedirectURL string
@@ -29,7 +33,10 @@ func (lp LogoutParams) Logout(w http.ResponseWriter, r *http.Request) {
 	session := sessions.GetSession(r)
 	session.Clear()
 
-	dataMap := map[string]interface{}{}
+	dataMap := map[string]interface{}{
+		"fs":          lp.FS,
+		"pageHeading": "Logged Out",
+	}
 	if err := GetTemplate(logoutPage).Render("layout", w, r, dataMap); err != nil {
 		ErrorHandler(w, r, err)
 	}
