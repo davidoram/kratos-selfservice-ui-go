@@ -2,9 +2,12 @@
 test:
 	go test ./options
 
-.PHONY: docker
+.PHONY: docker docker-push
 docker:
 	docker build -t davidoram/kratos-selfservice-ui-go:latest .
+
+docker-push:
+	docker image push davidoram/kratos-selfservice-ui-go:latest
 
 clean:
 	rm -rf static
