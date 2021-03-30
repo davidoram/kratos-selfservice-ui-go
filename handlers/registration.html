@@ -24,12 +24,15 @@
                         {{if .Disabled}}disabled{{end}}
                         class="border mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md px-6 py-4"
                   />
-                  {{range .Messages }}
-                    <p data-cy="field_message_id_{{$field.Name}}" class="mt-2 text-sm text-gray-500">
-                      <span >{{.ID}}</span>{{.Text}}
-                    </p>
-                  {{end}}
                 </div>
+
+                {{range .Messages }}
+                  <!-- Error messages -->
+                  <p data-cy="field_message_id_{{$field.Name}}" class="mt-2 text-sm text-red-500 bg-red-50">
+                    <span class="font-extrabold">{{.ID}}</span> &nbsp; {{.Text}}
+                  </p>
+                {{end}}
+
               </div>
             </div>
           {{end}}
