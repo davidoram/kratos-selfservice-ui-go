@@ -21,27 +21,6 @@ services:
     networks:
       - internal
 
-  kratos-selfservice-ui-go:
-    image: davidoram/kratos-selfservice-ui-go:latest
-    environment:
-      - KRATOS_PUBLIC_URL=http://kratos:4433/
-      - KRATOS_ADMIN_URL=http://kratos:4434/
-      - BASE_URL=/
-      # Enable debug trace of Kratos API calls
-      - DEBUG=1
-    networks:
-      internal:
-        # the aliases are not required, but are useful if the applications want to internally
-        # reference each other by host name
-        aliases:
-        - "app1.test"
-    labels:
-      - "traefik.port=4455"
-      - "traefik.http.routers.kratos-selfservice-ui-go.rule=Path(`/`) || PathPrefix(`/dashboard`,`/auth`,`/static`)"
-      - "traefik.docker.network=internal"
-      - "traefik.enable=true"
-    restart: on-failure
-
   kratos:
     depends_on:
       - kratos-migrate
@@ -81,6 +60,27 @@ services:
     networks:
       - internal
       - web
+
+  kratos-selfservice-ui-go:
+    image: davidoram/kratos-selfservice-ui-go:latest
+    environment:
+      - KRATOS_PUBLIC_URL=http://kratos:4433/
+      - KRATOS_ADMIN_URL=http://kratos:4434/
+      - BASE_URL=/
+      # Enable debug trace of Kratos API calls
+      - DEBUG=1
+    networks:
+      internal:
+        # the aliases are not required, but are useful if the applications want to internally
+        # reference each other by host name
+        aliases:
+        - "app1.test"
+    labels:
+      - "traefik.port=4455"
+      - "traefik.http.routers.kratos-selfservice-ui-go.rule=Path(`/`) || PathPrefix(`/dashboard`,`/auth`,`/static`)"
+      - "traefik.docker.network=internal"
+      - "traefik.enable=true"
+    restart: on-failure
 
   traefik:
     image: traefik:2.4
