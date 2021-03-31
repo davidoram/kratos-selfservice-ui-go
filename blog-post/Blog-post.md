@@ -173,6 +173,6 @@ The application experiments with a few interesting features that you might use i
 - The Docker file uses a multi-stage build, to produce a smaller Docker image.
 - Test suite for the website is written using [Cypress](https://www.cypress.io/). The tests cover all the important features. Here is the output from running the tests in headless mode.
 
-        [![asciicast](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp.svg)](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp)
+  [![asciicast](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp.svg)](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp)
 
 
