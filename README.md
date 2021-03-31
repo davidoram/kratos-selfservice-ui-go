@@ -3,10 +3,19 @@ ORY Kratos Self-Service UI written in golang 1.16 using the labstack Echo framew
 
 A self service UI for [Kratos](https://www.ory.sh/kratos) based on the NodeJS version but written in go 1.16.
 
-
-Provides:
+The application provides the following self service UI pages:
 
 - Registration
+- Login
+- Logout
+- User settings
+  - Update profile
+  - Change password
+  - Password reset
+
+and then once logged in provides the following additional page:
+
+- Dashboard
 
 # Quickstart
 
