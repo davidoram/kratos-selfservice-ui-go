@@ -103,7 +103,7 @@ func (rp RegistrationParams) Registration(w http.ResponseWriter, r *http.Request
 
 The handler is typical of the integration points that your app will have Kratos. First it checks for the `flow` URL parameter, and if not present redirects the browser to the Kratos endpoint `http://127.0.0.1/self-service/registration/browser` which starts registration inside Kratos, and then redirects straight back to this handler in your app.
 
-The next step is to call the `NewGetSelfServiceRegistrationFlowParams` Kratos API, along with the `flow` parameter which returns a data structure representing the form structure that Kratos is expecting to be posted back when the user submits in the form. This is when your application has the opertunity to style the form however it sees fit.
+The next step is to call the `NewGetSelfServiceRegistrationFlowParams` Kratos API, passing the `flow` parameter, which will return a data structure representing the form structure that Kratos is expecting.
 
 The data structure is as follows:
 
@@ -132,11 +132,11 @@ The data structure is as follows:
 }
 ```
 
-This data structure has been designed, so that it is deliberately easy to convert into an HTML form input elements, and the resulting form (with a sprinkling of CSS) looks as follows:
+This data structure has been designed, so that it is deliberately easy to convert into an HTML form.  The application constructs a form, and styles it to match the rest of my application:
 
 ![](registration.jpg)
 
-I've deliberately entered a weak password as part of my registration, and Kratos responds with an error encoded in the data structure that represents the form, so we can present that to the user, and allow them to respond. Errors are coded for easy translation, in this case `4000005` along with response text that described the error condition:
+I've deliberately entered a weak password as part of my registration, and when I sumbit the form, Kratos responds with the same data structure as before, but containing validation errors, so we can present that to the user, and allow them to respond. Errors are [coded](https://www.ory.sh/kratos/docs/concepts/ui-user-interface#messages) for easy translation, in this case `4000005` along with response text that described the error condition:
 
 ![](registration-weak-password.jpg)
 
@@ -148,23 +148,31 @@ Kratos has some flexibility around what happens next, in my case I have configur
 
 ![](registration-email.jpg)
 
+After registration, the user is automatically logged in to the site.
+
+Clicking on the [Dashboard](http://127.0.0.1/dashboard) link passes the request through the [KratoAuthMiddleware](middleware/kratos_auth.go), which calls the Kratos [`WhoAmI`](https://www.ory.sh/kratos/docs/reference/api#check-who-the-current-http-session-belongs-to) endpoint with  the `csrf_token` and `ory_kratos_session` cookies. `WhoAmiI` returns a `Session` object which contains a wealth of information about the logged in user.  A real app would likely cache that information for use in future calls, but our dashboard page simply displays the `Session` structure.
+
+![](dashboard.png)
 
 
+The other functions of the application are pretty self explanatory, [Login](http://127.0.0.1/auth/login), and [Logout](http://127.0.0.1/auth/logout) provide the obvious functions.  [Update Profile](http://127.0.0.1/auth/settings) is slightly more interesting, in that it presents a page with two forms, one to update your password, and the other to update name and email address. There is also an [Account recovery](http://127.0.0.1/auth/recovery) page linked to from the login page, for the situation when the user forgets their password.
 
+## Implementation notes
 
+Once you understand the general flow of the Kratos interactions, the integration work is relatively straightforward. Before starting its worth taking some time to look at all the [configuaration options](https://www.ory.sh/kratos/docs/reference/configuration) that Kratos provides.
 
-presents a page that
+The application experiments with a few interesting features that you might use in a production quality app:
 
-Implementation details
-
-I wrote a web application that provides self registration and login functions using Kratos.  I chose to write the application using the following tools:
-- The app is written in [go](https://golang.org/) version 1.16
+- The app is written in [Go](https://golang.org/) version 1.16
     - All html templates are [embedded](https://golang.org/pkg/embed/) in the binary. This means the entire app is contained in a single deployment file.
-    - I used the [Gorilla toolkit](  github.com/gorilla) to help build the website.
-    - The [HashFS](https://github.com/benbjohnson/hashfs) library allows static files to be correctly cached.
+    - The [Gorilla toolkit](github.com/gorilla) provides the URL multiplexor, useful middleware for logging and error handling, and session handling modules.
+    - The [HashFS](https://github.com/benbjohnson/hashfs) library allows static assets to be correctly cached by appending SHA256 hashes to filenames.
     - Kratos supply a [client api](github.com/ory/kratos-client-go)
-- I wanted to experiment with [Tailwind CSS](https://tailwindcss.com/). In my day job I don't normally get a chance to play with the look'n'feel of the app, so this was a fun part of the project for me.
+- I wanted to experiment with [Tailwind CSS](https://tailwindcss.com/). I don't normally get much chance to play with the look'n'feel of the app, so this was a fun part of the project for me.
 - There is a small amount of Javascript (opening and closing the menu), for which I wanted to evaluate [Stimulus](https://stimulus.hotwire.dev).
-- Test suite for the website is written using [Cypress](https://www.cypress.io/).
-- The dockerised test environment uses [traefik](https://traefik.io/traefik/) as a reverse proxy
+- The Docker file uses a multi-stage build, to produce a smaller Docker image.
+- Test suite for the website is written using [Cypress](https://www.cypress.io/). The tests cover all the important features. Here is the output from running the tests in headless mode.
+
+        [![asciicast](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp.svg)](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp)
+
 
