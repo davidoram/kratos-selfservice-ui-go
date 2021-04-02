@@ -41,7 +41,7 @@ func (rp RecoveryParams) Recovery(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 		return
 	}
-	log.Printf("Recovery state:", res.GetPayload().State)
+	log.Printf("Recovery state: %v", res.GetPayload().State)
 	dataMap := map[string]interface{}{
 		"flow":        flow,
 		"link":        res.GetPayload().Methods["link"].Config,

@@ -23,6 +23,8 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+// staticFS holds the static files, CSS images etc.
+// Its baked into the application executable using the embed API - see https://golang.org/pkg/embed/
 //go:embed static
 var staticFS embed.FS
 
@@ -47,12 +49,9 @@ func main() {
 	var store = sessions.NewCookieStore(opt.CookieStoreKeyPairs...)
 
 	// Static assets are wrapped in a hash fs that allows for aggesive http caching
-	//
-
 	var fsys = hashfs.NewFS(staticFS)
 
 	// Public Routes need no authentication
-	//
 	r := mux.NewRouter()
 
 	r.Use(gh.RecoveryHandler(gh.PrintRecoveryStack(true)),
@@ -97,7 +96,6 @@ func main() {
 	r.PathPrefix("/static/").Handler(hashfs.FileServer(fsys))
 
 	// Following routes must be authenticated, so they get extra middleware
-	//
 	authP := middleware.KratosAuthParams{
 		SessionStore:      session.SessionStore{Store: store},
 		WhoAmIURL:         opt.WhoAmIURL(),

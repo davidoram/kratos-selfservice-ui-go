@@ -1,6 +1,5 @@
-package session
-
 // session package provides typesafe access to session data
+package session
 
 import (
 	"log"

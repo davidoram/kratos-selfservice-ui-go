@@ -18,7 +18,8 @@ var (
 	}
 )
 
-// NoCacheMiddleware adds no cache headers to the response header.
+// NoCacheMiddleware adds no cache headers to the response header, that tell browsers
+// not to cache the content
 func NoCacheMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		for k, v := range noCacheHeaders {

@@ -19,7 +19,7 @@ type LogoutParams struct {
 	FlowRedirectURL string
 }
 
-// Logout handler clears teh session & logs the user out
+// Logout handler clears the session & logs the user out
 func (lp LogoutParams) Logout(w http.ResponseWriter, r *http.Request) {
 
 	// Start the logout flow with Kratos if required

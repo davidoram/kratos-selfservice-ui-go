@@ -13,7 +13,7 @@ When your application integrates with Krytos then you gain the benefits of:
 - BYO data model.  The identity data model that Kratos uses is provided by your application.
 - Long term support. Kratos project is supported by some big players in the open source space such as ThoughtWorks and the Raspberry Pi project.
 
-This blog post explains how to write an application `kratos-selfservice-ui-go`, that integrates with Kratos, written in  [go](https://golang.org/).. Go v1.16 was released recently, which introduces some new [features](https://golang.org/doc/go1.16) that make it more attractive for writing web applications (more about that below). Source code for `kratos-selfservice-ui-go` is available on [github]((https://github.com/davidoram/kratos-selfservice-ui-go)).
+This blog post explains how to write an application `kratos-selfservice-ui-go`, that integrates with Kratos, written in  [Go](https://golang.org/). Source code for `kratos-selfservice-ui-go` is available on [github](https://github.com/davidoram/kratos-selfservice-ui-go).
 
 The structure of the application is relatively straightforward, and based on the [Kratos self service example application written in Node](https://github.com/ory/kratos-selfservice-ui-node). It provides the following self service UI pages:
 
@@ -31,7 +31,7 @@ Once a user is logged in, they get access to the following additional page:
 
 ## Architecture
 
-For convenience, a demonstration system, composed of Docker images can be run using Docker compose.
+For convenience, a demonstration system, can be run using Docker compose.
 
 **Fig 1: Architecture overview**
 
@@ -40,11 +40,11 @@ For convenience, a demonstration system, composed of Docker images can be run us
 
 The components have these functions:
 
-- [`traefik`](https://traefik.io/traefik/) reverse proxy presents Kratos and the self service app together as a single unified website running under a single host, so that both Kratos and the self-service app can share state through cookies.
-- `kratos-migrate` service (not shown on the diagram) creates a [sqlite](https://www.sqlite.org/) database for Krytos, and runs database migrations
+- [`traefik`](https://traefik.io/traefik/) reverse proxy presents the Kratos and self service app together as a *single unified website* running under one host. This is improtant because Kratos and the self-service app share state through cookies.
+- `kratos-migrate` service (not shown on the diagram) creates a [sqlite](https://www.sqlite.org/) database for Krytos, and runs database migrations.
 - `kratos` is the Kryrtos server
 - [`mailhog`](https://github.com/mailhog/MailHog) is a self contained email server which presents a simple web UI, as well as an API which is usefull for integration testing.
-- `kratos-selfservice-ui-go` is our go sample application. It intgerate with Kratos, presenting all the web pages needed for for Kratos functions, as well as providing a Dashboard page that can only be accessed when the user is logged in.
+- `kratos-selfservice-ui-go` is our go sample application. It intgerates with Kratos, presenting all the UI pages needed by Kratos, as well as providing a Dashboard page that can only be accessed when the user is logged in.
 
 
 ## Running the sample
@@ -132,11 +132,17 @@ The data structure is as follows:
 }
 ```
 
-This data structure has been designed, so that it is deliberately easy to convert into an HTML form.  The application constructs a form, and styles it to match the rest of my application:
+It may not be immediately obvious, but this data structure has been designed, so that it is deliberately easy to convert into an HTML form.
+
+You simply contruct an HTML `<form>` element with the `action` and `method` attributes, and then iterate over the `fields`, turning each one into an `<input>` element with the attributes and `value` provided.  The only decision you need to make are the order that the fields are displayed on the form, and any styling you want to apply.
+
+Here is the resulting form:
 
 ![](registration.jpg)
 
-I've deliberately entered a weak password as part of my registration, and when I sumbit the form, Kratos responds with the same data structure as before, but containing validation errors, so we can present that to the user, and allow them to respond. Errors are [coded](https://www.ory.sh/kratos/docs/concepts/ui-user-interface#messages) for easy translation, in this case `4000005` along with response text that described the error condition:
+I've deliberately entered a weak password as part of my registration, and when I sumbitted the form, Kratos responds with the same data structure as before, but containing validation errors, so we can present that to the user, and allow them to respond.
+
+Errors are [coded](https://www.ory.sh/kratos/docs/concepts/ui-user-interface#messages) for easy translation, in this case `4000005` along with response text that described the error condition:
 
 ![](registration-weak-password.jpg)
 
@@ -144,35 +150,56 @@ Correcting that error and resubmitting the form, leads to a sucesful registratio
 
 ![](registration-ok.jpg)
 
-Kratos has some flexibility around what happens next, in my case I have configured Kratos to send a registration email, asking the user to confirm their email address, but this is not mandatory in order to login.  By opening [mailhog](http://localhost:8025/) we can view the email:
+Kratos has some flexibility around what happens next, in my case I have configured Kratos to send a registration email, asking the user to confirm their email address, but this is not required in order to login.  By opening [mailhog](http://localhost:8025/) we can view the email:
 
 ![](registration-email.jpg)
 
 After registration, the user is automatically logged in to the site.
 
-Clicking on the [Dashboard](http://127.0.0.1/dashboard) link passes the request through the [KratoAuthMiddleware](middleware/kratos_auth.go), which calls the Kratos [`WhoAmI`](https://www.ory.sh/kratos/docs/reference/api#check-who-the-current-http-session-belongs-to) endpoint with  the `csrf_token` and `ory_kratos_session` cookies. `WhoAmiI` returns a `Session` object which contains a wealth of information about the logged in user.  A real app would likely cache that information for use in future calls, but our dashboard page simply displays the `Session` structure.
+Clicking on the [Dashboard](http://127.0.0.1/dashboard) link passes the request through the [KratoAuthMiddleware](middleware/kratos_auth.go).  The purpose of this middleware is to restrict access to pages that require the user to be logged in.
+
+The `KratoAuthMiddleware` calls the Kratos [`WhoAmI`](https://www.ory.sh/kratos/docs/reference/api#check-who-the-current-http-session-belongs-to) endpoint with  the `csrf_token` and `ory_kratos_session` cookies. `WhoAmiI` returns a `Session` object which contains a wealth of information about the logged in user.
+
+If this were a real app, it would likely cache that information for use in future calls, but our dashboard page simply displays the `Session` structure.
 
 ![](dashboard.png)
 
 
-The other functions of the application are pretty self explanatory, [Login](http://127.0.0.1/auth/login), and [Logout](http://127.0.0.1/auth/logout) provide the obvious functions.  [Update Profile](http://127.0.0.1/auth/settings) is slightly more interesting, in that it presents a page with two forms, one to update your password, and the other to update name and email address. There is also an [Account recovery](http://127.0.0.1/auth/recovery) page linked to from the login page, for the situation when the user forgets their password.
+The other functions of the application are pretty self explanatory:
+
+- [Login](http://127.0.0.1/auth/login), and [Logout](http://127.0.0.1/auth/logout) provide the obvious functions.
+- [Update Profile](http://127.0.0.1/auth/settings) is slightly more interesting, in that it presents a page with two forms, one to update your password, and the other to update name and email address.
+- There is also an [Account recovery](http://127.0.0.1/auth/recovery) page linked to from the login page, for the situation when the user forgets their password.
+
+## Conclusions
+
+Once you understand the general flow of the Kratos interactions, the integration work is relatively straightforward, and Kratos provides a lot of functionaly, and flexibility which makes it a very attractive option for solving application authentication.
+
+Before starting its worth taking some time to look at all the [configuaration options](https://www.ory.sh/kratos/docs/reference/configuration) that Kratos provides. This will allow you to evaluate how you might migrate existing user data from another system into Kratos, or how to implement a system for your back office that would allow a helpdesk user to find users in the system and help them with login issues.
+
+There is *much* more to Kratos that covered in the blog post, I encourage you to look through the [Kratos docs](https://www.ory.sh/kratos/docs/) if you want to learn more.
 
 ## Implementation notes
 
-Once you understand the general flow of the Kratos interactions, the integration work is relatively straightforward. Before starting its worth taking some time to look at all the [configuaration options](https://www.ory.sh/kratos/docs/reference/configuration) that Kratos provides.
-
-The application experiments with a few interesting features that you might use in a production quality app:
+The application experiments with a few interesting features that you might use in a production quality Go app:
 
 - The app is written in [Go](https://golang.org/) version 1.16
-    - All html templates are [embedded](https://golang.org/pkg/embed/) in the binary. This means the entire app is contained in a single deployment file.
+    - All html templates are [embedded](https://golang.org/pkg/embed/) in the binary. This means the entire app is contained in a single executable.
     - The [Gorilla toolkit](github.com/gorilla) provides the URL multiplexor, useful middleware for logging and error handling, and session handling modules.
-    - The [HashFS](https://github.com/benbjohnson/hashfs) library allows static assets to be correctly cached by appending SHA256 hashes to filenames.
-    - Kratos supply a [client api](github.com/ory/kratos-client-go)
-- I wanted to experiment with [Tailwind CSS](https://tailwindcss.com/). I don't normally get much chance to play with the look'n'feel of the app, so this was a fun part of the project for me.
-- There is a small amount of Javascript (opening and closing the menu), for which I wanted to evaluate [Stimulus](https://stimulus.hotwire.dev).
-- The Docker file uses a multi-stage build, to produce a smaller Docker image.
-- Test suite for the website is written using [Cypress](https://www.cypress.io/). The tests cover all the important features. Here is the output from running the tests in headless mode.
+    - The [HashFS](https://github.com/benbjohnson/hashfs) library allows static assets (CSS, JS) to be correctly cached by appending SHA256 hashes to filenames.
+    - Kratos supply a [Go client api](github.com/ory/kratos-client-go), which makes development easier.
+- I experimented with [Tailwind CSS](https://tailwindcss.com/). I don't normally get much chance to play with the look'n'feel of the app, so this was a fun part of the project for me.
+  - Note that I haven't applied any steps to minimize the CSS, but I would expect that to be relatively straightforward.
+- There is a small amount of Javascript (opening and closing the menu), for which I used [Stimulus](https://stimulus.hotwire.dev), as a simpler alternative to using something like React.
+- The Docker file uses a multi-stage build, to compile the app, and then produce a smaller Docker image (approx 18 Mb).
+- A comprehensive test suite for the website is written using [Cypress](https://www.cypress.io/). I focussed on integration tests, rather than a lot of unit tests, because thats what this project was all about. The tests cover most if not all of the integration points.
+    - The application uses `data-cy` attributes as test hooks, as recommended in the [cypress best practices](https://docs.cypress.io/guides/references/best-practices#Selecting-Elements).
+    - Tests use the `mailhog` API to check programatically if emails are sent correctly. See [recovery.js](cypress-tests/cypress/integration/recovery.js) for an example of this.
+    - Tests run in Docker, so no need to install cypress.
+    - Its easy to run tests against newer (or older) browser releases, by altering the base image in the [Dockerfile](cypress-tests/Dockerfile)
+    - Easy to run the tests in headless or interactive mode. The interactive tests use a browsers bundled with the [cypress-included](https://github.com/cypress-io/cypress-docker-images#cypress-docker-images-) images, which means that it does not interfere or clash with the browser running on my laptop. See the `make cypress` target to see how that runs in conjunction with an [X](https://en.wikipedia.org/wiki/X_Window_System) server running on my laptop.
+    - On the downside, an extra step is required to include the custom node modules required by the tests in the docker image - see `make cypress-docker` and [Dockerfile](cypress-tests/Dockerfile) for details.
+    - Here is a video of the running the tests in headless mode:
 
-  [![asciicast](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp.svg)](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp)
-
+[![asciicast](https://asciinema.org/a/NikVhrzOo326n2e6H3EfpCzLv.svg)](https://asciinema.org/a/NikVhrzOo326n2e6H3EfpCzLv)
 
