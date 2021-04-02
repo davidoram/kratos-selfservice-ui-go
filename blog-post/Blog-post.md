@@ -13,7 +13,7 @@ When your application integrates with Krytos then you gain the benefits of:
 - BYO data model.  The identity data model that Kratos uses is provided by your application.
 - Long term support. Kratos project is supported by some big players in the open source space such as ThoughtWorks and the Raspberry Pi project.
 
-This blog post explains how to write an application `kratos-selfservice-ui-go`, that integrates with Kratos, written in  [Go](https://golang.org/). Source code for `kratos-selfservice-ui-go` is available on [github]((https://github.com/davidoram/kratos-selfservice-ui-go)).
+This blog post explains how to write an application `kratos-selfservice-ui-go`, that integrates with Kratos, written in  [Go](https://golang.org/). Source code for `kratos-selfservice-ui-go` is available on [github](https://github.com/davidoram/kratos-selfservice-ui-go).
 
 The structure of the application is relatively straightforward, and based on the [Kratos self service example application written in Node](https://github.com/ory/kratos-selfservice-ui-node). It provides the following self service UI pages:
 
@@ -44,7 +44,7 @@ The components have these functions:
 - `kratos-migrate` service (not shown on the diagram) creates a [sqlite](https://www.sqlite.org/) database for Krytos, and runs database migrations.
 - `kratos` is the Kryrtos server
 - [`mailhog`](https://github.com/mailhog/MailHog) is a self contained email server which presents a simple web UI, as well as an API which is usefull for integration testing.
-- `kratos-selfservice-ui-go` is our go sample application. It intgerate with Kratos, presenting all the web pages needed for for Kratos functions, as well as providing a Dashboard page that can only be accessed when the user is logged in.
+- `kratos-selfservice-ui-go` is our go sample application. It intgerates with Kratos, presenting all the UI pages needed by Kratos, as well as providing a Dashboard page that can only be accessed when the user is logged in.
 
 
 ## Running the sample
