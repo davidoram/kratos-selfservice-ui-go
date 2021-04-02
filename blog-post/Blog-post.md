@@ -13,7 +13,7 @@ When your application integrates with Krytos then you gain the benefits of:
 - BYO data model.  The identity data model that Kratos uses is provided by your application.
 - Long term support. Kratos project is supported by some big players in the open source space such as ThoughtWorks and the Raspberry Pi project.
 
-This blog post explains how to write an application `kratos-selfservice-ui-go`, that integrates with Kratos, written in  [go](https://golang.org/).. Go v1.16 was released recently, which introduces some new [features](https://golang.org/doc/go1.16) that make it more attractive for writing web applications (more about that below). Source code for `kratos-selfservice-ui-go` is available on [github]((https://github.com/davidoram/kratos-selfservice-ui-go)).
+This blog post explains how to write an application `kratos-selfservice-ui-go`, that integrates with Kratos, written in  [Go](https://golang.org/). Source code for `kratos-selfservice-ui-go` is available on [github]((https://github.com/davidoram/kratos-selfservice-ui-go)).
 
 The structure of the application is relatively straightforward, and based on the [Kratos self service example application written in Node](https://github.com/ory/kratos-selfservice-ui-node). It provides the following self service UI pages:
 
@@ -31,7 +31,7 @@ Once a user is logged in, they get access to the following additional page:
 
 ## Architecture
 
-For convenience, a demonstration system, composed of Docker images can be run using Docker compose.
+For convenience, a demonstration system, can be run using Docker compose.
 
 **Fig 1: Architecture overview**
 
@@ -40,8 +40,8 @@ For convenience, a demonstration system, composed of Docker images can be run us
 
 The components have these functions:
 
-- [`traefik`](https://traefik.io/traefik/) reverse proxy presents Kratos and the self service app together as a single unified website running under a single host, so that both Kratos and the self-service app can share state through cookies.
-- `kratos-migrate` service (not shown on the diagram) creates a [sqlite](https://www.sqlite.org/) database for Krytos, and runs database migrations
+- [`traefik`](https://traefik.io/traefik/) reverse proxy presents the Kratos and self service app together as a *single unified website* running under one host. This is improtant because Kratos and the self-service app share state through cookies.
+- `kratos-migrate` service (not shown on the diagram) creates a [sqlite](https://www.sqlite.org/) database for Krytos, and runs database migrations.
 - `kratos` is the Kryrtos server
 - [`mailhog`](https://github.com/mailhog/MailHog) is a self contained email server which presents a simple web UI, as well as an API which is usefull for integration testing.
 - `kratos-selfservice-ui-go` is our go sample application. It intgerate with Kratos, presenting all the web pages needed for for Kratos functions, as well as providing a Dashboard page that can only be accessed when the user is logged in.
@@ -176,6 +176,7 @@ The application experiments with a few interesting features that you might use i
 - The Docker file uses a multi-stage build, to produce a smaller Docker image (approx 7 Mb).
 - Test suite for the website is written using [Cypress](https://www.cypress.io/). The tests cover all the important features.
     - The application uses `data-cy` attributes as test hooks, as recommended in the [cypress best practices](https://docs.cypress.io/guides/references/best-practices#Selecting-Elements).
+    - The test use the `mailhog` API to check programatically if registration emails are correct.
     - Tests run in Docker, so no need to install cypress.
     - Its easy to run tests against newer (or older) browser releases, by altering the base image in the [Dockerfile](cypress-tests/Dockerfile)
     - Easy to run the tests in headless or interactive mode. The interactive tests use a browsers bundled with the [cypress-included](https://github.com/cypress-io/cypress-docker-images#cypress-docker-images-) images, which means that it does not interfere or clash with the browser running on my laptop. See the `make cypress` target to see how that runs in conjunction with an [X](https://en.wikipedia.org/wiki/X_Window_System) server running on my laptop.
