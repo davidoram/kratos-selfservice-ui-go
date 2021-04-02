@@ -161,6 +161,8 @@ The other functions of the application are pretty self explanatory, [Login](http
 
 Once you understand the general flow of the Kratos interactions, the integration work is relatively straightforward. Before starting its worth taking some time to look at all the [configuaration options](https://www.ory.sh/kratos/docs/reference/configuration) that Kratos provides.
 
+There is *much* more to Kratos that covered in the blog post, I encourage you to look through the [Kratos docs](https://www.ory.sh/kratos/docs/), if you want to learn more.
+
 The application experiments with a few interesting features that you might use in a production quality app:
 
 - The app is written in [Go](https://golang.org/) version 1.16
@@ -169,10 +171,17 @@ The application experiments with a few interesting features that you might use i
     - The [HashFS](https://github.com/benbjohnson/hashfs) library allows static assets to be correctly cached by appending SHA256 hashes to filenames.
     - Kratos supply a [client api](github.com/ory/kratos-client-go)
 - I wanted to experiment with [Tailwind CSS](https://tailwindcss.com/). I don't normally get much chance to play with the look'n'feel of the app, so this was a fun part of the project for me.
+  - Note that I haven't applied any steps to minimize the CSS, but I would expect that to be relatively straightforward.
 - There is a small amount of Javascript (opening and closing the menu), for which I wanted to evaluate [Stimulus](https://stimulus.hotwire.dev).
-- The Docker file uses a multi-stage build, to produce a smaller Docker image.
-- Test suite for the website is written using [Cypress](https://www.cypress.io/). The tests cover all the important features. Here is the output from running the tests in headless mode.
+- The Docker file uses a multi-stage build, to produce a smaller Docker image (approx 7 Mb).
+- Test suite for the website is written using [Cypress](https://www.cypress.io/). The tests cover all the important features.
+    - The application uses `data-cy` attributes as test hooks, as recommended in the [cypress best practices](https://docs.cypress.io/guides/references/best-practices#Selecting-Elements).
+    - Tests run in Docker, so no need to install cypress.
+    - Its easy to run tests against newer (or older) browser releases, by altering the base image in the [Dockerfile](cypress-tests/Dockerfile)
+    - Easy to run the tests in headless or interactive mode. The interactive tests use a browsers bundled with the [cypress-included](https://github.com/cypress-io/cypress-docker-images#cypress-docker-images-) images, which means that it does not interfere or clash with the browser running on my laptop. See the `make cypress` target to see how that runs in conjunction with an [X](https://en.wikipedia.org/wiki/X_Window_System) server running on my laptop.
+    - On the downside, an extra step is required to include the node modules required by tests in the docker image - see `make cypress-docker` and [Dockerfile](cypress-tests/Dockerfile) for details.
+    - Here is a video of the running the tests in headless mode:
 
-  [![asciicast](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp.svg)](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp)
+[![asciicast](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp.svg)](https://asciinema.org/a/3d7PJlIy7og8G09WaTgo2wMwp)
 
 
