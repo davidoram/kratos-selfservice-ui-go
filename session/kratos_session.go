@@ -7,6 +7,8 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+// KratosSession is used to access information from a Kratos 'Session'
+// JSON payload
 type KratosSession struct {
 	session *string
 }

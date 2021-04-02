@@ -5,6 +5,7 @@ import (
 	"net/url"
 )
 
+// URLValue is a custom data type for parsing URL values with the 'flag' package
 type URLValue struct {
 	URL *url.URL
 }

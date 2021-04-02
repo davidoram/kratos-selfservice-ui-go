@@ -16,7 +16,8 @@ type DashboardParams struct {
 	session.SessionStore
 }
 
-// Dashboard page is accessible to logged in users only
+// Dashboard page is accessible to logged in users only, the proptection for that is provide by
+// KratoAuthMiddleware middleware
 func (p DashboardParams) Dashboard(w http.ResponseWriter, r *http.Request) {
 	log.Printf("dashboard")
 

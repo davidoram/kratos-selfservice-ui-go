@@ -11,6 +11,7 @@ import (
 // KratosAuthParams configure the KratosAuth http handler
 type KratosAuthParams struct {
 	session.SessionStore
+
 	// WhoAmIURL is the API endpoint fo the Kratis 'whoami' call that returns the
 	// details of an authenticated session
 	WhoAmIURL string
@@ -21,8 +22,8 @@ type KratosAuthParams struct {
 }
 
 // KratoAuthMiddleware retrieves the user from the session via Kratos WhoAmIURL,
-// proceed through the middleware chain.
-// If the session is not authenticated, will redirects to the RedirectUnauthURL
+// and if the user is authenticated the request will proceed through the middleware chain.
+// If the session is not authenticated, redirects to the RedirectUnauthURL
 func (p KratosAuthParams) KratoAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		csrfCookie, csrfErr := r.Cookie("csrf_token")

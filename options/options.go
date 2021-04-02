@@ -15,17 +15,24 @@ import (
 	"github.com/gorilla/securecookie"
 )
 
+// Options holds the application command line options
 type Options struct {
-	// KratosAdminURL is the URL where ORY Kratos's Admin API is located at. If this app and ORY Kratos are running in the same private network, this should be the private network address (e.g. kratos-admin.svc.cluster.local).
+
+	// KratosAdminURL is the URL where ORY Kratos's Admin API is located at.
+	// If this app and ORY Kratos are running in the same private network, this should be the
+	// private network address (e.g. kratos-admin.svc.cluster.local).
 	KratosAdminURL *url.URL
 
-	// KratosPublicURL is the URL where ORY Kratos's Public API is located at. If this app and ORY Kratos are running in the same private network, this should be the private network address (e.g. kratos-public.svc.cluster.local).
+	// KratosPublicURL is the URL where ORY Kratos's Public API is located at.
+	// If this app and ORY Kratos are running in the same private network, this should be the
+	// private network address (e.g. kratos-public.svc.cluster.local).
 	KratosPublicURL *url.URL
 
 	// KratosBrowserURL is the URL where ORY Kratos's self service browser endpoints are located at.
 	KratosBrowserURL *url.URL
 
-	// BaseURL is the base url of this app. If served e.g. behind a proxy or via GitHub pages this would be the path, e.g. https://mywebsite.com/kratos-selfservice-ui-go/. Must be absolute!
+	// BaseURL is the base url of this app. If served e.g. behind a proxy or via GitHub pages
+	// this would be the path, e.g. https://mywebsite.com/kratos-selfservice-ui-go/. Must be absolute!
 	BaseURL *url.URL
 
 	// Host that the app is listening on. Used together with Port
@@ -37,9 +44,11 @@ type Options struct {
 	// Duration to wait when asked to shutdown gracefully
 	ShutdownWait time.Duration
 
-	// TLSCertPath is an optional Path to certificate file. Should be set up together with TLSKeyPath to enable HTTPS.
+	// TLSCertPath is an optional Path to certificate file.
+	// Should be set up together with TLSKeyPath to enable HTTPS.
 	TLSCertPath string
-	// TLSCertPath is an optional path to key file Should be set up together with TLSCertPath to enable HTTPS.
+	// TLSCertPath is an optional path to key file.
+	// Should be set up together with TLSCertPath to enable HTTPS.
 	TLSKeyPath string
 
 	// Pairs of authentication and encryption keys for Cookies
@@ -55,6 +64,9 @@ func NewOptions() *Options {
 	}
 }
 
+// SetFromCommandLine will parse the command line, and populate the Options.
+// The special case is when the 'gen-cookie-store-key-pair' is detected, will genrate the keys and exit
+// Will also exit if key-pairs passed in are invalid
 func (o *Options) SetFromCommandLine() *Options {
 
 	KratosAdminURL := MustMakeURLValue(os.Getenv("KRATOS_ADMIN_URL"))

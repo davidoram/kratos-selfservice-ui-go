@@ -23,8 +23,8 @@ const (
 	ErrRenderingPage = "Error rendering page"
 )
 
-// RegisterTemplate creates a html template with a name, and a FuncMap for a set of template strings.
-// Pass all the Map youu want included in the 'templates', including layout templates etc
+// RegisterTemplate creates a html template with a name, and a FuncMap for a set of template strings,
+// along with a list of 'templates' which will include the 'layout', 'header', 'footer' and 'content' etc
 func RegisterTemplate(name TemplateName, fmap template.FuncMap, templates ...string) error {
 	var err error
 	tmpl := template.New(string(name)).Funcs(fmap)

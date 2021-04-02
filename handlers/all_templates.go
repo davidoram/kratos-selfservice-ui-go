@@ -10,6 +10,11 @@ import (
 	"github.com/benbjohnson/hashfs"
 )
 
+// Each HTML file has an associated variable that is populated
+// with its content at build time - see https://golang.org/pkg/embed/
+//
+// This means the binary contains everything it needs to serve the site
+//
 var (
 	// Shared templates
 	//
@@ -46,7 +51,7 @@ var (
 	{{end}}`
 )
 
-// TemplateName is the type used to name a template
+// TemplateName provides a typesafe way of referring to templates
 type TemplateName string
 
 const (
@@ -59,15 +64,18 @@ const (
 	settingsPage     = TemplateName("settings")
 )
 
-// Register the templates used by this handler
+// Register all the Templates during initialisation
 func init() {
 	type tmpl struct {
-		name      TemplateName
-		fmap      template.FuncMap
-		templates []string
-		stimulus  string // This pages stimulus controller code, optional
+		name      TemplateName     // Template name that handler code will refer to - one for each 'page'
+		fmap      template.FuncMap // List of functions used inside the template
+		templates []string         // List of HTML templates, snippets etc that make up the page
+		stimulus  string           // Optional stimulus controller code
 	}
+	// All pages get the commonTemplates
 	commonTemplates := []string{layoutTemplate, navbarTemplate, commonStimulusTemplate, pageHeadingTemplate}
+
+	// The templates and their associated functions to include etc
 	templates := []tmpl{
 		{name: homePage, fmap: emptyFuncMap, templates: []string{homeTemplate}},
 		{name: dashboardPage, fmap: emptyFuncMap, templates: []string{dashboardTemplate}},
@@ -92,6 +100,7 @@ func init() {
 		}
 
 		if err := RegisterTemplate(t.name, t.fmap, tmpl...); err != nil {
+			// If we have a problem with a template, abort the app
 			log.Fatalf("%v template error: %v", t.name, err)
 		}
 	}

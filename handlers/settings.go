@@ -20,7 +20,7 @@ type SettingsParams struct {
 	FlowRedirectURL string
 }
 
-// Settings handler displays the Settings screen
+// Settings handler displays the Settings screen that allows the user to change their details
 func (lp SettingsParams) Settings(w http.ResponseWriter, r *http.Request) {
 
 	// Start the Settings flow with Kratos if required
