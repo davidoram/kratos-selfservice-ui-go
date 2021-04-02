@@ -1,5 +1,5 @@
 # kratos-selfservice-ui-go
-ORY Kratos Self-Service UI written in golang 1.16 using the labstack Echo framework
+ORY Kratos Self-Service UI written in golang 1.16.
 
 A self service UI for [Kratos](https://www.ory.sh/kratos) based on the NodeJS version but written in go 1.16.
 
@@ -19,10 +19,10 @@ and then once logged in provides the following additional page:
 
 # Quickstart
 
+- Start docker
 - Run `make quickstart` to run the systems in docker compose
-- `open http://127.0.0.1:4455/dashboard`
+- `open http://127.0.0.1`
 - Because you are not logged in you will be taken to the login page by default
-https://gist.github.com/Ocramius/d44b9c500d3fd19e863c621500adeec0
 
 # Cypress tests
 
@@ -54,5 +54,4 @@ Icons from [Bootstrap](https://icons.getbootstrap.com/)
 # TODO
  - Add gzip middleware
  - Fix traefik warnings "level=warning msg="Could not find network named 'internal' for container '/kratos-selfservice-ui-go_kratos-selfservice-ui-go_1'! Maybe you're missing the project's prefix in the label? Defaulting to first available network." container=kratos-selfservice-ui-go-kratos-selfservice-ui-go-2fd978669efd2f580e1ac7fcb67271ea7d966fbcdc75a2498c15786af0ff702d serviceName=kratos-selfservice-ui-go-kratos-selfservice-ui-go providerName=docker"
- - Write up a blog post
 

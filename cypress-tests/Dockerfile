@@ -1,3 +1,3 @@
-FROM cypress/included:5.4.0
+FROM cypress/included:6.8.0
 ADD . .
 RUN npm install --save-dev --save-prod
