@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/davidoram/kratos-selfservice-ui-go/session"
 )
@@ -52,6 +53,7 @@ func (p KratosAuthParams) KratoAuthMiddleware(next http.Handler) http.Handler {
 		req.Header.Add("Accept", "application/json")
 
 		// Make the API call
+		start := time.Now()
 		log.Printf("Calling Kratos %s", p.WhoAmIURL)
 		var res *http.Response
 		if res, err = client.Do(req); err != nil {
@@ -59,6 +61,7 @@ func (p KratosAuthParams) KratoAuthMiddleware(next http.Handler) http.Handler {
 			http.Redirect(w, r, p.RedirectUnauthURL, http.StatusPermanentRedirect)
 			return
 		}
+		end := time.Now()
 		if res.StatusCode != 200 {
 			log.Printf("Error status code != 200: %d, redirect to %s", res.StatusCode, p.RedirectUnauthURL)
 			http.Redirect(w, r, p.RedirectUnauthURL, http.StatusPermanentRedirect)
@@ -78,8 +81,8 @@ func (p KratosAuthParams) KratoAuthMiddleware(next http.Handler) http.Handler {
 			http.Redirect(w, r, p.RedirectUnauthURL, http.StatusPermanentRedirect)
 			return
 		}
-
-		log.Printf("kratosSession retrieved ok")
+		duration := end.Sub(start)
+		log.Printf("kratosSession retrieved ok, took %v", duration)
 
 		next.ServeHTTP(w, r)
 	})

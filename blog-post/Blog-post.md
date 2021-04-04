@@ -160,7 +160,7 @@ Clicking on the [Dashboard](http://127.0.0.1/dashboard) link passes the request 
 
 The `KratoAuthMiddleware` calls the Kratos [`WhoAmI`](https://www.ory.sh/kratos/docs/reference/api#check-who-the-current-http-session-belongs-to) endpoint with  the `csrf_token` and `ory_kratos_session` cookies. `WhoAmiI` returns a `Session` object which contains a wealth of information about the logged in user.
 
-If this were a real app, it would likely cache that information for use in future calls, but our dashboard page simply displays the `Session` structure.
+Calling the `WhoAmiI` API **every time** a protected page is accessed, is the [recommended approach](https://github.com/ory/kratos/discussions/1207), to verifying that the session is still active. This means that Kratos has responsibility for managing the session lifecycle, see [configuration](https://www.ory.sh/kratos/docs/reference/configuration) (refer to `session.lifespan`). On my laptop, running everything locally this call only takes 3-8 ms, but it will be worth checking performance in your scenario, with a production sized database of users.
 
 ![](dashboard.png)
 
